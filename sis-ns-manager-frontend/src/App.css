@@ -1,0 +1,98 @@
+/* App layout */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+}
+
+/* Header */
+.app-header {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.app-header__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.app-header__university {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1565c0;
+  letter-spacing: 0.01em;
+}
+
+.app-header__divider {
+  color: #bdbdbd;
+  font-size: 14px;
+}
+
+.app-header__title {
+  font-size: 14px;
+  font-weight: 400;
+  color: #616161;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+/* Main content */
+.app-main {
+  flex: 1;
+  padding: 40px 24px 64px;
+}
+
+.app-main__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Page header */
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header__title {
+  font-size: 28px;
+  font-weight: 500;
+  color: #212121;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+
+.page-header__subtitle {
+  font-size: 14px;
+  color: #757575;
+  margin: 0;
+}
+
+/* Course list */
+.course-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .app-main {
+    padding: 24px 16px 48px;
+  }
+
+  .course-grid {
+    grid-template-columns: 1fr;
+  }
+}

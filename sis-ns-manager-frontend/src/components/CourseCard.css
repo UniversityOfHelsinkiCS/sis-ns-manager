@@ -1,0 +1,322 @@
+.course-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.15s ease;
+}
+
+.course-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.course-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+  width: 130px;
+}
+
+.course-card__code {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #1565c0;
+  background: #e3f0fc;
+  padding: 2px 7px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.course-card__period {
+  font-size: 11px;
+  color: #9e9e9e;
+}
+
+.course-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.course-card__name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #212121;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.course-card__ns-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.course-card__status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #2e7d32;
+  background: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  padding: 1px 7px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.course-card__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4caf50;
+  flex-shrink: 0;
+}
+
+.course-card__active-until {
+  font-size: 11px;
+  color: #9e9e9e;
+}
+
+.course-card__active-until--expired {
+  color: #c62828;
+}
+
+.course-card__ns-preview {
+  font-size: 11px;
+  font-family: ui-monospace, Consolas, monospace;
+  color: #bdbdbd;
+}
+
+.course-card__actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Namespace tag previews in modal */
+.course-card__groups-ns-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.course-card__ns-tag {
+  font-size: 11px;
+  font-family: ui-monospace, Consolas, monospace;
+  color: #616161;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.course-card__ns-tag--more {
+  color: #9e9e9e;
+  font-family: inherit;
+}
+
+.course-card__groups-input {
+  width: 72px;
+  padding: 6px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #212121;
+  background: #fafafa;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.course-card__groups-input:focus {
+  border-color: #1976d2;
+  background: #fff;
+}
+
+/* Student list in modal */
+.modal-student-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.modal-student-list__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-student-list__item:last-child {
+  border-bottom: none;
+}
+
+.modal-student-list__item:nth-child(even) {
+  background: #fafafa;
+}
+
+.modal-student-list__name {
+  color: #212121;
+}
+
+.modal-student-list__number {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11px;
+  color: #9e9e9e;
+}
+
+/* Checkbox */
+.modal-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #212121;
+  cursor: pointer;
+  user-select: none;
+}
+
+.modal-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #1976d2;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Group setup revealed by checkbox */
+.modal-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+}
+
+/* Modal fields */
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-field--row {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-field__label {
+  font-size: 12px;
+  color: #757575;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modal-field__text {
+  font-size: 14px;
+  color: #212121;
+}
+
+.modal-field__value {
+  font-size: 14px;
+  color: #212121;
+  background: #f5f5f5;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Buttons */
+.btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+  letter-spacing: 0.02em;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn--primary {
+  background: #1976d2;
+  color: #fff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: #1565c0;
+}
+
+.btn--secondary {
+  background: #f5f5f5;
+  color: #424242;
+  border: 1px solid #e0e0e0;
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background: #eeeeee;
+}
+
+.btn--success {
+  background: #388e3c;
+  color: #fff;
+}
+
+.btn--success:hover:not(:disabled) {
+  background: #2e7d32;
+}
+
+.btn--manage {
+  background: #f5f5f5;
+  color: #424242;
+  border: 1px solid #e0e0e0;
+}
+
+.btn--manage:hover:not(:disabled) {
+  background: #eeeeee;
+}
+
+.btn--success-outline {
+  background: #f5f5f5;
+  color: #388e3c;
+  border: 1px solid #c8e6c9;
+}
+
+.btn--sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
