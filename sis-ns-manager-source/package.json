@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev-front": "vite ./sis-ns-manager-frontend",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "dev-back": "node --watch --experimental-strip-types sis-ns-manager-backend/index.ts",
+    "build": "vite build ./sis-ns-manager-frontend",
+    "start": "node --experimental-strip-types sis-ns-manager-backend/index.ts",
+    "lint": "eslint 'src/**/*.{ts,tsx}'",
     "preview": "vite preview"
   },
   "dependencies": {
