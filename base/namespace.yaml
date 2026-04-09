@@ -1,0 +1,6 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: sis-ns-manager
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false, Delete=false
