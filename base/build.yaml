@@ -23,7 +23,7 @@ spec:
   resources: {}
   runPolicy: Serial
   source:
-    contextDir: /sis-ns-manager-source
+    contextDir: sis-ns-manager-source
     git:
       uri: https://github.com/UniversityOfHelsinkiCS/sis-ns-manager.git
     type: Git
