@@ -23,7 +23,26 @@ rules:
       - ""
     resources:
       - serviceaccounts
+      - services
     verbs:
       - create
       - delete
+      - patch
+  - apiGroups:
+      - "apps"
+    resources:
+      - "deployments"
+    verbs:
+      - create
+      - delete
+      - update
+      - patch
+  - apiGroups:
+      - route.openshift.io
+    resources:
+      - routes
+    verbs:
+      - create
+      - delete
+      - update
       - patch
