@@ -14,7 +14,7 @@ spec:
       labels:
         app: sis-ns-manager
     spec:
-      serviceAccountName: sis-ns-manager
+      serviceAccountName: manager
       containers:
         - name: sis-ns-manager
           image: sis-ns-manager:latest
