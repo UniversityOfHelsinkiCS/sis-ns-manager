@@ -6,5 +6,5 @@ resources:
   - serviceaccount.yaml
   - namespace.yaml
   # argocd:n vaatimat palikat
-  - ldap-sync.clusterrole.yaml
-  - ldap-sync.clusterrolebinding.yaml
+  - sis-ns-manager.clusterrole.yaml
+  - sis-ns-manager.clusterrolebinding.yaml
