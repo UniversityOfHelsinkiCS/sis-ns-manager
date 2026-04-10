@@ -26,9 +26,11 @@ spec:
     contextDir: /sis-ns-manager-source
     git:
       uri: https://github.com/UniversityOfHelsinkiCS/sis-ns-manager.git
+      ref: test-clusters
     type: Git
   strategy:
-    dockerStrategy: {}
+    dockerStrategy:
+      dockerfilePath: Dockerfile
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
