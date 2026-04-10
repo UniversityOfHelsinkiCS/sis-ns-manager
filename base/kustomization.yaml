@@ -5,6 +5,5 @@ resources:
   - build.yaml
   - serviceaccount.yaml
   - namespace.yaml
-  # argocd:n vaatimat palikat
   - sis-ns-manager.clusterrole.yaml
   - sis-ns-manager.clusterrolebinding.yaml
