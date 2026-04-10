@@ -5,5 +5,8 @@ resources:
   - build.yaml
   - serviceaccount.yaml
   - namespace.yaml
+  - deployment.yaml
+  - route.yaml
+  - service.yaml
   - sis-ns-manager.clusterrole.yaml
   - sis-ns-manager.clusterrolebinding.yaml
