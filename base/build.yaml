@@ -38,6 +38,6 @@ spec:
   triggers:
   - github:
       secretReference:
-        name: sis-ns-manager-generic-webhook-secret
+        name: sis-ns-manager-github-webhook-secret
     type: "GitHub"
   - type: ConfigChange
