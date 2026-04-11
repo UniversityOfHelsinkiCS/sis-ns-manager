@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sis-ns-manager
+  annotations:
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"sis-ns-manager:latest","namespace":"sis-ns-manager"},"fieldPath":"spec.template.spec.containers[?(@.name==\"sis-ns-manager\")].image"}]'
 spec:
   replicas: 1
   selector:
