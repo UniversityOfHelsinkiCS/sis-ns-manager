@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Course } from '../types'
+import type { Course } from '@common/types'
 import { getMockStudents, getMockNamespaces } from '../mock'
 import { getActiveUntil, getPeriodEnd, formatDate, courseNsName } from '../utils'
 import { CreateNamespaceModal } from './CreateNamespaceModal'

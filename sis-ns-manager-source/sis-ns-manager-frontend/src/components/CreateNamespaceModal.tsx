@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Course, GroupAssignment } from '../types'
+import type { Course, GroupAssignment } from '@common/types'
 import { StudentGroupAssignment, autoAssign } from './StudentGroupAssignment'
 import { Modal } from './Modal'
 

@@ -22,7 +22,11 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@common/*": ["./sis-ns-manager-common/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["sis-ns-manager-frontend/src", "sis-ns-manager-common"]
 }

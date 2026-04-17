@@ -1,4 +1,4 @@
-import type { Course, Student, NamespaceInfo } from './types'
+import type { Course, Student, NamespaceInfo } from '@common/types'
 
 export const mockCourses: Course[] = [
   {

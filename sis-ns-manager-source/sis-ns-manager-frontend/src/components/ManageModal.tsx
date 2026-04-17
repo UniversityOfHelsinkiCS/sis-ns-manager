@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Course, NamespaceInfo } from '../types'
+import type { Course, NamespaceInfo } from '@common/types'
 import { Modal } from './Modal'
 import { formatDate } from '../utils'
 import './ManageModal.css'

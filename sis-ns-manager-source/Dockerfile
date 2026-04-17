@@ -11,6 +11,6 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/sis-ns-manager-frontend/dist ./sis-ns-manager-frontend/dist
 COPY sis-ns-manager-backend ./sis-ns-manager-backend
-COPY sis-ns-manager-frontend/src/types.ts ./sis-ns-manager-frontend/src/types.ts
+COPY sis-ns-manager-common ./sis-ns-manager-common
 EXPOSE 3000
 CMD ["npm", "run", "start"]

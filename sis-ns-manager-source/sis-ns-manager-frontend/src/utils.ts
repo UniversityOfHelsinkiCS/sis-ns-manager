@@ -1,4 +1,4 @@
-import type { Course } from './types'
+import type { Course } from '@common/types'
 
 // Approximate end month/day for each academic period
 const PERIOD_END: Record<string, [month: number, day: number]> = {

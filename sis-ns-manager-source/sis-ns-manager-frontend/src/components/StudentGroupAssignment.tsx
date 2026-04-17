@@ -1,4 +1,4 @@
-import type { Student, GroupAssignment } from '../types'
+import type { Student, GroupAssignment } from '@common/types'
 import './StudentGroupAssignment.css'
 
 interface Props {
