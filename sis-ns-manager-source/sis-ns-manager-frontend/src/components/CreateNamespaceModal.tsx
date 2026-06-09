@@ -1,22 +1,20 @@
 import { useState } from 'react'
-import type { Course, GroupAssignment } from '@common/types'
+import type { CourseUnitRealisation, Student, GroupAssignment } from '@common/types'
 import { StudentGroupAssignment, autoAssign } from './StudentGroupAssignment'
 import { Modal } from './Modal'
 
 interface Props {
-  course: Course
+  course: CourseUnitRealisation
   nsName: string
-  students: { id: string; name: string; studentNumber: string }[]
+  students: Student[]
   onClose: () => void
   onCreated: () => void
 }
 
 export function CreateNamespaceModal({ course, nsName, students, onClose, onCreated }: Props) {
-  const defaultGroupCount = Math.max(1, Math.ceil(students.length / 5))
-
   const [loading, setLoading] = useState(false)
   const [createGroups, setCreateGroups] = useState(false)
-  const [groupCount, setGroupCount] = useState(defaultGroupCount)
+  const [groupCount, setGroupCount] = useState(4)
   const [assignment, setAssignment] = useState<GroupAssignment>({})
 
   function handleGroupCountChange(count: number) {
@@ -33,11 +31,13 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
     }, 1200)
   }
 
+  const displayName = (course.name.fi ?? course.name.en ?? course.id) as string
+
   return (
     <Modal title="Create namespace" onClose={onClose}>
       <div className="modal-field">
         <span className="modal-field__label">Course</span>
-        <span className="modal-field__text">{course.name}</span>
+        <span className="modal-field__text">{displayName}</span>
       </div>
       {!createGroups && (
         <div className="modal-field">
@@ -45,18 +45,6 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
           <code className="modal-field__value">{nsName}</code>
         </div>
       )}
-
-      <div className="modal-field">
-        <span className="modal-field__label">Students ({students.length})</span>
-        <ul className="modal-student-list">
-          {students.map(s => (
-            <li key={s.id} className="modal-student-list__item">
-              <span className="modal-student-list__name">{s.name}</span>
-              <span className="modal-student-list__number">{s.studentNumber}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
 
       <label className="modal-checkbox">
         <input

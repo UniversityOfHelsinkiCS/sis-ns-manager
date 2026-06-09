@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import type { Course, NamespaceInfo } from '@common/types'
+import type { CourseUnitRealisation, NamespaceInfo } from '@common/types'
 import { Modal } from './Modal'
 import { formatDate } from '../utils'
 import './ManageModal.css'
 
 interface Props {
-  course: Course
+  course: CourseUnitRealisation
   nsName: string
   namespaces: NamespaceInfo[]
   onClose: () => void
@@ -14,6 +14,8 @@ interface Props {
 export function ManageModal({ course, nsName, namespaces, onClose }: Props) {
   const [confirmation, setConfirmation] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const displayName = (course.name.fi ?? course.name.en ?? course.id) as string
 
   function handleDelete() {
     setLoading(true)
@@ -26,10 +28,10 @@ export function ManageModal({ course, nsName, namespaces, onClose }: Props) {
   const confirmed = confirmation === nsName
 
   return (
-    <Modal title={`Manage — ${course.code}`} onClose={onClose}>
+    <Modal title={`Manage — ${course.id}`} onClose={onClose}>
       <div className="modal-field">
         <span className="modal-field__label">Course</span>
-        <span className="modal-field__text">{course.name}</span>
+        <span className="modal-field__text">{displayName}</span>
       </div>
 
       <div className="modal-field">

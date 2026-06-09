@@ -2,22 +2,44 @@ import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import router from './routes/router.ts'
+import passport from 'passport'
+import mockUserMiddleware from './middleware/mock_user.ts'
+import { inDevelopment } from './utils/config.ts'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const distPath = path.join(__dirname, '..', 'sis-ns-manager-frontend', 'dist')
 
-const app = express()
+
+
+
+
 const PORT = process.env.PORT ?? 3001
 
+const app = express()
 
+app.use(passport.initialize())
 
+if (inDevelopment) {
+  app.use(mockUserMiddleware)
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    next()
+  })
+}
 
 app.use('/api', router)
 app.use('/api', (_, res) => {
   res.sendStatus(404)
 })
 
-app.use(express.static(distPath))
+
+if (process.env.NODE_ENV === 'production') {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url))
+  const distPath = path.join(__dirname, '..', 'sis-ns-manager-frontend', 'dist')
+  app.use(express.static(distPath))
+  app.get('*', (_, res) => {
+    res.sendFile(path.join(distPath, 'index.html'))
+  })
+}
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sis-ns-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sis-ns-manager
+  template:
+    metadata:
+      labels:
+        app: sis-ns-manager
+    spec:
+      containers:
+        - name: sis-ns-manager
+          image: sis-ns-manager:latest
+          ports:
+            - containerPort: 3001
+          env:
+            - name: NODE_ENV
+              value: production
+          envFrom:
+            - secretRef:
+                name: sis-ns-manager-secret

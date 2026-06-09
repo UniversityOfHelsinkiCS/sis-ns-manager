@@ -1,14 +1,8 @@
 import express from 'express'
 const okdRouter = express.Router()
 
-okdRouter.get('/', (_, res) => {
-  res.sendStatus(404)
+okdRouter.get('/namespaces', async (req, res) => {
+    res.send("testestestestestes")
 })
-
-okdRouter.get('/courses', (req, res) => {
-  res.sendStatus(404).json({ message: "Missing user"})
-})
-
-
 
 export default okdRouter

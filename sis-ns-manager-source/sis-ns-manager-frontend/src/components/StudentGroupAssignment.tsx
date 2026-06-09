@@ -11,7 +11,7 @@ interface Props {
 export function autoAssign(students: Student[], groupCount: number): GroupAssignment {
   const result: GroupAssignment = {}
   students.forEach((s, i) => {
-    result[s.id] = (i % groupCount) + 1
+    result[s.studentNumber] = (i % groupCount) + 1
   })
   return result
 }
@@ -24,7 +24,7 @@ export function StudentGroupAssignment({ students, groupCount, assignment, onCha
   }
 
   const countPerGroup = groups.map(g =>
-    students.filter(s => assignment[s.id] === g).length
+    students.filter(s => assignment[s.studentNumber] === g).length
   )
 
   return (
@@ -47,14 +47,15 @@ export function StudentGroupAssignment({ students, groupCount, assignment, onCha
               <span className="sga__group-count">{countPerGroup[gi]}</span>
             </div>
             <ul className="sga__student-list">
-              {students.filter(s => assignment[s.id] === g).map(s => (
-                <li key={s.id} className="sga__student">
-                  <span className="sga__student-name">{s.name}</span>
+              {students.filter(s => assignment[s.studentNumber] === g).map(s => (
+                <li key={s.studentNumber} className="sga__student">
+                  <span className="sga__student-name">{`${s.firstNames.split(' ')[0]} ${s.lastName}`}</span>
+                  <span className="sga__student-number">{s.studentNumber}</span>
                   <select
                     className="sga__student-select"
-                    value={assignment[s.id] ?? 0}
-                    onChange={e => setGroup(s.id, Number(e.target.value))}
-                    aria-label={`Move ${s.name} to group`}
+                    value={assignment[s.studentNumber] ?? 0}
+                    onChange={e => setGroup(s.studentNumber, Number(e.target.value))}
+                    aria-label={`Move ${`${s.firstNames.split(' ')[0]} ${s.lastName}`} to group`}
                   >
                     {groups.map(opt => (
                       <option key={opt} value={opt}>→ {opt}</option>
@@ -70,18 +71,19 @@ export function StudentGroupAssignment({ students, groupCount, assignment, onCha
         ))}
       </div>
 
-      {students.some(s => !assignment[s.id]) && (
+      {students.some(s => !assignment[s.studentNumber]) && (
         <div className="sga__unassigned">
           <span className="sga__unassigned-label">Unassigned</span>
           <ul className="sga__unassigned-list">
-            {students.filter(s => !assignment[s.id]).map(s => (
-              <li key={s.id} className="sga__student">
-                <span className="sga__student-name">{s.name}</span>
+            {students.filter(s => !assignment[s.studentNumber]).map(s => (
+              <li key={s.studentNumber} className="sga__student">
+                <span className="sga__student-name">{`${s.firstNames.split(' ')[0]} ${s.lastName}`}</span>
+                <span className="sga__student-number">{s.studentNumber}</span>
                 <select
                   className="sga__student-select"
                   value={0}
-                  onChange={e => setGroup(s.id, Number(e.target.value))}
-                  aria-label={`Assign ${s.name} to group`}
+                  onChange={e => setGroup(s.studentNumber, Number(e.target.value))}
+                  aria-label={`Assign ${`${s.firstNames.split(' ')[0]} ${s.lastName}`} to group`}
                 >
                   <option value={0}>— assign</option>
                   {groups.map(opt => (

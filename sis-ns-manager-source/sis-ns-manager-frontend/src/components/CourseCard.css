@@ -31,7 +31,10 @@
   background: #e3f0fc;
   padding: 2px 7px;
   border-radius: 4px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
 }
 
 .course-card__period {
