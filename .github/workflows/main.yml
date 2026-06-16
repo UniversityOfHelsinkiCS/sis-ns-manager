@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Explore-GitHub-Actions:
+  test-scaleset:
     # You need to use the INSTALLATION_NAME from the previous step
     runs-on: runner-scaleset
     steps:
