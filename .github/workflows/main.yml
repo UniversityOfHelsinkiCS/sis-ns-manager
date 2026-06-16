@@ -1,4 +1,4 @@
-name: Actions Runner Controller Demo
+name: okd-cs-test-0 local runner test
 on:
   workflow_dispatch:
 
