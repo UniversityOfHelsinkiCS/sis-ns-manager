@@ -1,6 +1,6 @@
 import express from 'express'
 import axios from 'axios'
-import type { User } from '../../sis-ns-manager-common/types.ts'
+import type { User } from '../../common/types.ts'
 import { DATABASE_URL } from '../utils/config.ts'
 const sisRouter = express.Router()
 

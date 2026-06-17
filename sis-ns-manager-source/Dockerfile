@@ -9,7 +9,7 @@ FROM node:24-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
-COPY --from=build /app/sis-ns-manager-frontend/dist ./sis-ns-manager-frontend/dist
-COPY sis-ns-manager-backend ./sis-ns-manager-backend
+COPY --from=build /app/frontend/dist ./frontend/dist
+COPY backend ./backend
 EXPOSE 3001
 CMD ["npm", "run", "start"]

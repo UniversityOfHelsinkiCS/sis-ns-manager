@@ -11,15 +11,14 @@ export default defineConfig(({ mode }) => {
   const backendUrl = env.BACKEND_URL || 'http://localhost:3001'
 
   return {
-    root: path.resolve(__dirname, 'sis-ns-manager-frontend'),
+    root: path.resolve(__dirname, 'frontend'),
     plugins: [react()],
     resolve: {
       alias: {
-        '@common': path.resolve(__dirname, 'sis-ns-manager-common'),
+        '@common': path.resolve(__dirname, 'common'),
       },
     },
     server: {
-      host: true,
       proxy: {
         '/api': {
           target: backendUrl,

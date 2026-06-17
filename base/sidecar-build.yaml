@@ -1,0 +1,43 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: sis-ns-manager-sidecar
+  namespace: sis-ns-manager
+spec:
+  lookupPolicy:
+    local: false
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: sis-ns-manager-sidecar-build
+  namespace: sis-ns-manager
+spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: sis-ns-manager-sidecar:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    contextDir: /sis-ns-manager-sidecar
+    git:
+      uri: git@github.com:UniversityOfHelsinkiCS/sis-ns-manager.git
+      ref: test-clusters
+    sourceSecret:
+      name: sis-ns-manager-repo
+    type: Git
+  strategy:
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+    type: Docker
+  successfulBuildsHistoryLimit: 5
+  triggers:
+  - github:
+      secretReference:
+        name: sis-ns-manager-github-webhook-secret
+    type: "GitHub"
+  - type: ConfigChange

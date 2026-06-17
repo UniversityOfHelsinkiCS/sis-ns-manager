@@ -33,7 +33,7 @@ app.use('/api', (_, res) => {
 
 if (process.env.NODE_ENV === 'production') {
   const __dirname = path.dirname(fileURLToPath(import.meta.url))
-  const distPath = path.join(__dirname, '..', 'sis-ns-manager-frontend', 'dist')
+  const distPath = path.join(__dirname, '..', 'frontend', 'dist')
   app.use(express.static(distPath))
   app.get('/{*path}', (_, res) => {
     res.sendFile(path.join(distPath, 'index.html'))

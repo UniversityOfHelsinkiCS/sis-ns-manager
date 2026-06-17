@@ -3,6 +3,9 @@ kind: Kustomization
 
 resources:
   - build.yaml
+  - sidecar-build.yaml
+  - sidecar-cronjob.yaml
+  - sidecar-serviceaccount.yaml
   - serviceaccount.yaml
   - namespace.yaml
   - deployment.yaml

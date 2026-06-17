@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "NODE_ENV=development concurrently -n back,front -c blue,green \"npm run dev-back\" \"npm run dev-front\"",
     "dev-front": "vite",
-    "dev-back": "node --watch --experimental-strip-types sis-ns-manager-backend/index.ts",
+    "dev-back": "node --watch --experimental-strip-types backend/index.ts",
     "build": "vite build",
-    "start": "NODE_ENV=production node --experimental-strip-types sis-ns-manager-backend/index.ts",
+    "start": "NODE_ENV=production node --experimental-strip-types backend/index.ts",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "preview": "vite preview"
   },

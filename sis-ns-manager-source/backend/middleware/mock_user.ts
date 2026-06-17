@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import type { User } from '../../sis-ns-manager-common/types.ts'
+import type { User } from '../../common/types.ts'
 import { DEV_PERSON_ID, DEV_PERSON_NAME } from '../utils/config.ts'
 
 export const mockUser: User = {

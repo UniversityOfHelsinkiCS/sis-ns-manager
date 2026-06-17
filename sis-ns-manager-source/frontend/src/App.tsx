@@ -3,13 +3,28 @@ import axios from 'axios'
 import type { CourseUnitRealisation } from '@common/types'
 import { CourseCard } from './components/CourseCard'
 import './App.css'
+import useRequiredUser from './util/useRequiredUser'
+import { RedirectToLogin } from './util/redirectToLogin'
 
 export default function App() {
+  const { user, isLoading: isUserLoading, isUnauthorized } = useRequiredUser()
+
   const [courses, setCourses] = useState<CourseUnitRealisation[]>([])
   const [username, setUsername] = useState<string | null>(null)
 
   useEffect(() => {
-    const load = async () => {
+    const init = async () => {
+      try {
+        const { data } = await axios.get('/api/user')
+        setUsername(data.username)
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          window.location.href = '/login'
+          return
+        }
+        throw error
+      }
+
       const response = await fetch('/api/sis/courses')
       const data: CourseUnitRealisation[] = await response.json()
       setCourses(data.sort((a, b) =>
@@ -17,13 +32,7 @@ export default function App() {
       ))
     }
 
-    const loadUser = async () => {
-      const { data } = await axios.get('/api/user')
-      setUsername(data.username)
-    }
-
-    load()
-    loadUser()
+    init()
   }, [])
 
   return (

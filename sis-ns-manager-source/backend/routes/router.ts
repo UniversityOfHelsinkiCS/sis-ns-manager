@@ -2,7 +2,7 @@ import express from 'express'
 import sisRouter from './sis.ts'
 import okdRouter from './okd.ts'
 import passport from 'passport'
-import type { User } from '../../sis-ns-manager-common/types.ts'
+import type { User } from '../../common/types.ts'
 
 
 const router = express.Router({mergeParams: true})
@@ -26,8 +26,7 @@ router.get('/user', (req, res) => {
 
 router.get('/login', passport.authenticate('oidc'))
 
-router.get(
-  '/login/callback',
+router.get('/login/callback',
   passport.authenticate('oidc', { failureRedirect: '/' }),
   async (_req, res) => {
     res.redirect('/')
