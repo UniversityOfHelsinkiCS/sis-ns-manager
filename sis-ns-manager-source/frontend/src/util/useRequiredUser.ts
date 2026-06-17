@@ -1,4 +1,4 @@
-import type { User } from '../../sis-ns-manager-frontend/types'
+import type { User } from '@common/types'
 import useApi from './useApi'
 import { isUnauthorizedResponse } from './redirectToLogin'
 

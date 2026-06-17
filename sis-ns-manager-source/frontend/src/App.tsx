@@ -52,18 +52,31 @@ export default function App() {
 
       <main className="app-main">
         <div className="app-main__inner">
-          <div className="page-header">
-            <h1 className="page-header__title">Courses</h1>
-            <p className="page-header__subtitle">
-              Provision Kubernetes namespaces in the OKD cluster for your courses.
-            </p>
-          </div>
+          {!isUserLoading && user && !user.isAllowed ? (
+            <div className="access-notice" role="alert">
+              <h2 className="access-notice__title">Access required</h2>
+              <p className="access-notice__text">
+                Your account is not a member of the <code>grp-okd-teachers</code>{' '}
+                group, which is required to use this application. Request access
+                and try again.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="page-header">
+                <h1 className="page-header__title">Courses</h1>
+                <p className="page-header__subtitle">
+                  Provision Kubernetes namespaces in the OKD cluster for your courses.
+                </p>
+              </div>
 
-          <div className="course-grid">
-            {courses.map(course => (
-              <CourseCard key={course.id} course={course} />
-            ))}
-          </div>
+              <div className="course-grid">
+                {courses.map(course => (
+                  <CourseCard key={course.id} course={course} />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>

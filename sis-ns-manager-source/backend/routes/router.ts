@@ -3,6 +3,7 @@ import sisRouter from './sis.ts'
 import okdRouter from './okd.ts'
 import passport from 'passport'
 import type { User } from '../../common/types.ts'
+import { isAllowed } from '../utils/validations.ts'
 
 
 const router = express.Router({mergeParams: true})
@@ -20,6 +21,7 @@ router.get('/user', (req, res) => {
   const user = req.user as User
   const returnData: User = {
     ...user,
+    isAllowed: isAllowed(user),
   }
   res.json(returnData)
 })

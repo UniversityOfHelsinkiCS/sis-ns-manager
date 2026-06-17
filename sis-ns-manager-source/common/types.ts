@@ -46,4 +46,5 @@ export type User = {
   username: string
   hyPersonSisuId: string
   email: string
+  hyGroupCn: string[] | null
 }

@@ -7,7 +7,7 @@ spec:
     kind: Service
     name: sis-ns-manager
   port:
-    targetPort: 3000
+    targetPort: 3001
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect

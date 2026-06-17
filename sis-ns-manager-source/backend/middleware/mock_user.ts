@@ -7,6 +7,7 @@ export const mockUser: User = {
   username: DEV_PERSON_NAME,
   hyPersonSisuId: DEV_PERSON_ID,
   email: 'example-toska@helsinki.fi',
+  hyGroupCn: ['grp-okd-teachers'],
 }
 
 const mockUserMiddleware = (req: Request, _: Response, next: NextFunction) => {
