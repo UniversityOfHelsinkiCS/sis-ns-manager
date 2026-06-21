@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { CourseUnitRealisation, Student, GroupAssignment } from '@common/types'
 import { StudentGroupAssignment, autoAssign } from './StudentGroupAssignment'
 import { Modal } from './Modal'
+import { createNamespace, addNamespaceUsers, errorMessage } from '../util/okdApi'
 
 interface Props {
   course: CourseUnitRealisation
@@ -13,6 +14,7 @@ interface Props {
 
 export function CreateNamespaceModal({ course, nsName, students, onClose, onCreated }: Props) {
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [createGroups, setCreateGroups] = useState(false)
   const [groupCount, setGroupCount] = useState(4)
   const [assignment, setAssignment] = useState<GroupAssignment>({})
@@ -23,12 +25,30 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
     setAssignment(autoAssign(students, n))
   }
 
-  function handleCreate() {
+  async function handleCreate() {
     setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
+    setError(null)
+    try {
+      if (!createGroups) {
+        await createNamespace(nsName, course.id)
+      } else {
+        for (let group = 1; group <= groupCount; group++) {
+          const groupNs = `${nsName}-group-${group}`
+          await createNamespace(groupNs, course.id)
+
+          const studentNumbers = students
+            .filter(s => assignment[s.studentNumber] === group)
+            .map(s => s.studentNumber)
+          if (studentNumbers.length > 0) {
+            await addNamespaceUsers(groupNs, studentNumbers)
+          }
+        }
+      }
       onCreated()
-    }, 1200)
+    } catch (err) {
+      setError(errorMessage(err, 'Failed to create namespace'))
+      setLoading(false)
+    }
   }
 
   const displayName = (course.name.fi ?? course.name.en ?? course.id) as string
@@ -92,6 +112,10 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
             )}
           </div>
         </div>
+      )}
+
+      {error && (
+        <p style={{ color: '#c62828', fontSize: 13, margin: '12px 0 0' }}>{error}</p>
       )}
 
       <div className="modal__footer">

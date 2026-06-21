@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { CourseUnitRealisation, NamespaceInfo } from '@common/types'
 import { Modal } from './Modal'
 import { formatDate } from '../utils'
+import { deleteNamespace, errorMessage } from '../util/okdApi'
 import './ManageModal.css'
 
 interface Props {
@@ -9,20 +10,32 @@ interface Props {
   nsName: string
   namespaces: NamespaceInfo[]
   onClose: () => void
+  onDeleted: () => void
 }
 
-export function ManageModal({ course, nsName, namespaces, onClose }: Props) {
+export function ManageModal({ course, nsName, namespaces, onClose, onDeleted }: Props) {
   const [confirmation, setConfirmation] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const displayName = (course.name.fi ?? course.name.en ?? course.id) as string
 
-  function handleDelete() {
+  const deletionDate = (() => {
+    const d = new Date()
+    d.setDate(d.getDate() + 1)
+    return formatDate(d)
+  })()
+
+  async function handleDelete() {
     setLoading(true)
-    setTimeout(() => {
+    setError(null)
+    try {
+      await Promise.all(namespaces.map(ns => deleteNamespace(ns.name)))
+      onDeleted()
+    } catch (err) {
+      setError(errorMessage(err, 'Failed to delete namespaces'))
       setLoading(false)
-      onClose()
-    }, 1200)
+    }
   }
 
   const confirmed = confirmation === nsName
@@ -62,7 +75,9 @@ export function ManageModal({ course, nsName, namespaces, onClose }: Props) {
 
       <div className="manage-delete">
         <p className="manage-delete__description">
-          To delete all namespaces for this course, type the namespace name below to confirm.
+          Deleting schedules every namespace for this course for removal. They
+          remain available for a 1-day grace period and are permanently deleted
+          tomorrow ({deletionDate}). Type the namespace name below to confirm.
         </p>
         <code className="modal-field__value">{nsName}</code>
         <input
@@ -74,6 +89,10 @@ export function ManageModal({ course, nsName, namespaces, onClose }: Props) {
           disabled={loading}
         />
       </div>
+
+      {error && (
+        <p style={{ color: '#c62828', fontSize: 13, margin: '12px 0 0' }}>{error}</p>
+      )}
 
       <div className="modal__footer">
         <button className="btn btn--secondary" onClick={onClose}>

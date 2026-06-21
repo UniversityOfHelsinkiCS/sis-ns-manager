@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import type { CourseUnitRealisation, Student } from '@common/types'
+import type { CourseUnitRealisation, NamespaceInfo, Student } from '@common/types'
 import { getActiveUntil, getCourseEndDate, formatDate, courseNsName } from '../utils'
 import { CreateNamespaceModal } from './CreateNamespaceModal'
 import { ManageModal } from './ManageModal'
+import useApi from '../util/useApi'
+import type { NamespaceSummary } from '../util/okdApi'
 import './CourseCard.css'
 
 interface Props {
@@ -11,7 +13,28 @@ interface Props {
 
 export function CourseCard({ course }: Props) {
   const nsName = courseNsName(course)
-  const existingNamespaces: import('@common/types').NamespaceInfo[] = []
+
+  const { data, refetch } = useApi<NamespaceSummary[]>(
+    'namespaces',
+    '/api/okd/namespaces',
+    'GET',
+  )
+  const all = Array.isArray(data) ? data : []
+
+  const existingNamespaces: NamespaceInfo[] = all
+    .filter((ns) => ns.name === nsName || ns.name.startsWith(`${nsName}-group-`))
+    .map((ns) => {
+      const groupMatch = ns.name === nsName ? null : ns.name.match(/-group-(\d+)$/)
+      return {
+        name: ns.name,
+        type: groupMatch ? 'group' : 'course',
+        groupNumber: groupMatch ? Number(groupMatch[1]) : undefined,
+        created: ns.created,
+        activeUntil: ns.endDate ?? undefined,
+        studentCount: 0,
+      }
+    })
+
   const isActive = existingNamespaces.length > 0
   const courseNs = existingNamespaces.find(n => n.type === 'course')
   const activeUntilDate = courseNs?.activeUntil
@@ -80,7 +103,7 @@ export function CourseCard({ course }: Props) {
           nsName={nsName}
           students={students}
           onClose={() => setCreateOpen(false)}
-          onCreated={() => setCreateOpen(false)}
+          onCreated={() => { refetch(); setCreateOpen(false) }}
         />
       )}
       {manageOpen && (
@@ -89,6 +112,7 @@ export function CourseCard({ course }: Props) {
           nsName={nsName}
           namespaces={existingNamespaces}
           onClose={() => setManageOpen(false)}
+          onDeleted={() => { refetch(); setManageOpen(false) }}
         />
       )}
     </>
