@@ -32,13 +32,11 @@ router.get('/login/callback',
   }
 )
 
-router.get('/logout', requireUser, async (req, res, next) => {
+router.get('/logout', requireUser, (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err)
     res.redirect('/')
   })
-
-  res.redirect('/')
 })
 
 export default router

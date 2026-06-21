@@ -1,30 +1,20 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import type { CourseUnitRealisation } from '@common/types'
 import { CourseCard } from './components/CourseCard'
 import './App.css'
 import useRequiredUser from './util/useRequiredUser'
-import { RedirectToLogin } from './util/redirectToLogin'
 
 export default function App() {
   const { user, isLoading: isUserLoading, isUnauthorized } = useRequiredUser()
 
   const [courses, setCourses] = useState<CourseUnitRealisation[]>([])
-  const [username, setUsername] = useState<string | null>(null)
+
+  const hasAccess = Boolean(user && user.isAllowed)
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        const { data } = await axios.get('/api/user')
-        setUsername(data.username)
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          window.location.href = '/api/login'
-          return
-        }
-        throw error
-      }
+    if (!hasAccess) return
 
+    const loadCourses = async () => {
       const response = await fetch('/api/sis/courses')
       const data: CourseUnitRealisation[] = await response.json()
       setCourses(data.sort((a, b) =>
@@ -32,8 +22,8 @@ export default function App() {
       ))
     }
 
-    init()
-  }, [])
+    loadCourses()
+  }, [hasAccess])
 
   return (
     <div className="app">
@@ -44,9 +34,9 @@ export default function App() {
             <span className="app-header__divider" aria-hidden="true">·</span>
             <span className="app-header__title">sis-namespace-manager</span>
           </div>
-          {username && (
+          {user && (
             <div className="app-header__account">
-              <span className="app-header__user">Logged in as: {username}</span>
+              <span className="app-header__user">Logged in as: {user.username}</span>
               <button
                 className="btn btn--primary btn--sm"
                 onClick={() => { window.location.href = '/api/logout' }}
@@ -60,7 +50,17 @@ export default function App() {
 
       <main className="app-main">
         <div className="app-main__inner">
-          {!isUserLoading && user && !user.isAllowed ? (
+          {isUserLoading ? null : isUnauthorized ? (
+            <div className="login-notice">
+              <p className="login-notice__text">Not logged in!</p>
+              <button
+                className="btn btn--primary"
+                onClick={() => { window.location.href = '/api/login' }}
+              >
+                Login
+              </button>
+            </div>
+          ) : user && !user.isAllowed ? (
             <div className="access-notice" role="alert">
               <h2 className="access-notice__title">Access required</h2>
               <p className="access-notice__text">
