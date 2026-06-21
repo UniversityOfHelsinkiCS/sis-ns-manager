@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sis-ns-manager-pruner
+  annotations:
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"sis-ns-manager-pruner:latest","namespace":"sis-ns-manager"},"fieldPath":"spec.jobTemplate.spec.template.spec.containers[?(@.name==\"sis-ns-manager-pruner\")].image"}]'
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: sis-ns-manager-pruner
+        spec:
+          serviceAccountName: pruner
+          restartPolicy: Never
+          containers:
+            - name: sis-ns-manager-pruner
+              image: image-registry.openshift-image-registry.svc:5000/sis-ns-manager/sis-ns-manager-pruner

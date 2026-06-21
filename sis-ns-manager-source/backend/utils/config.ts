@@ -8,6 +8,8 @@ export const DEV_PERSON_ID = process.env.DEV_PERSON_ID || 'hy-hlo-12345'
 
 
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret'
+export const REDIS_HOST = process.env.REDIS_HOST || ''
+export const REDIS_PASSWORD = process.env.REDIS_PASSWORD || ''
 export const OIDC_CLIENT_ID = process.env.OIDC_CLIENT_ID || ''
 export const OIDC_CLIENT_SECRET = process.env.OIDC_CLIENT_SECRET || ''
 export const OIDC_REDIRECT_URI = process.env.OIDC_REDIRECT_URI || ''

@@ -10,7 +10,7 @@ import {
   OIDC_REDIRECT_URI,
 } from './config.ts'
 
-export const params = {
+export const oidcParams = {
   scope: 'openid profile',
   claims: {
     id_token: {

@@ -3,9 +3,9 @@ kind: Kustomization
 
 resources:
   - build.yaml
-  #- sidecar-build.yaml
-  #- sidecar-cronjob.yaml
-  #- sidecar-serviceaccount.yaml
+  #- pruner-build.yaml
+  #- pruner-cronjob.yaml
+  #- pruner-serviceaccount.yaml
   - serviceaccount.yaml
   - namespace.yaml
   - deployment.yaml

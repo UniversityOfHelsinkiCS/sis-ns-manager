@@ -19,7 +19,7 @@ export default function App() {
         setUsername(data.username)
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
-          window.location.href = '/login'
+          window.location.href = '/api/login'
           return
         }
         throw error
