@@ -13,6 +13,8 @@ spec:
       labels:
         app: redis
     spec:
+      imagePullSecrets:
+        - name: dockerhub-regcred
       containers:
         - name: redis
           image: redis:7-alpine
