@@ -9,6 +9,7 @@ resources:
   - serviceaccount.yaml
   - namespace.yaml
   - deployment.yaml
+  - redis.yaml
   - route.yaml
   - service.yaml
   - sis-ns-manager.clusterrole.yaml

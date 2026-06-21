@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: sis-ns-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          # In-memory session cache only: disable RDB/AOF persistence so Redis
+          # never writes to /data (avoids the restricted-SCC random-UID write
+          # permission problem), and require a password from the app secret.
+          command:
+            - sh
+            - -c
+            - 'exec redis-server --save "" --appendonly no --requirepass "$REDIS_PASSWORD"'
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sis-ns-manager-secret
+                  key: REDIS_PASSWORD
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "redis-cli -a \"$REDIS_PASSWORD\" ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: sis-ns-manager
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
