@@ -3,11 +3,10 @@ import type { CourseUnitRealisation, Student } from '../../common/types.ts'
 // Hardcoded demo data served to the demo user (see isDemoUser in validations.ts).
 // The demo user logs in normally but has no real SIS data, so these stand in.
 //
-// Course ids use a `demo-` prefix on purpose: they are not valid SIS
-// CourseUnitRealisation ids, so the "Course page" link
-// (studies.helsinki.fi/courses/course-implementation/<id>) resolves to a
-// non-existent course. Names are amateur-radio / antenna themed and do not
-// correspond to any real course.
+// Courses are real University of Helsinki CS course implementations: the ids are
+// the real SIS CourseUnitRealisation ids, so the "Course page" link
+// (studies.helsinki.fi/courses/course-implementation/<id>) resolves to the
+// actual course. Students below are fabricated (random usernames).
 
 function demoCourse(
   id: string,
@@ -39,26 +38,29 @@ function demoCourse(
 }
 
 export const demoCourses: CourseUnitRealisation[] = [
+  // CSM141091
   demoCourse(
-    'demo-cur-antenna-basics-2026',
-    'Antennitekniikan perusteet',
-    'Fundamentals of Antenna Technology',
-    '2026-01-13',
-    '2026-03-06',
+    'otm-e534066a-d0e9-49b1-9208-62805f4d64c4',
+    'Full Stack -websovelluskehitys harjoitustyö',
+    'Full Stack Web Development Project',
+    '2026-06-01',
+    '2026-08-31',
   ),
+  // TKT20019
   demoCourse(
-    'demo-cur-yagi-design-2026',
-    'Yagi-antennien suunnittelu',
-    'Yagi Antenna Design',
-    '2026-03-16',
-    '2026-05-08',
+    'hy-opt-cur-2526-e435f40e-4faa-4140-96b6-e77a2e161b06',
+    'Tietokannat ja web-ohjelmointi',
+    'Databases and Web Programming',
+    '2026-05-04',
+    '2026-06-30',
   ),
+  // CSM13001
   demoCourse(
-    'demo-cur-hf-propagation-2026',
-    'Radioamatöörin HF-radioyhteydet',
-    'Amateur Radio HF Propagation',
-    '2026-09-01',
-    '2026-10-23',
+    'hy-opt-cur-2526-b8ec1422-835b-4bdb-bd2c-25df506de0f8',
+    'Distributed Systems',
+    'Distributed Systems',
+    '2026-10-26',
+    '2026-12-18',
   ),
 ]
 
@@ -74,7 +76,7 @@ function student(
 // Usernames (eduPersonPrincipalName) are random 10-character strings: nine
 // lowercase letters followed by a digit. No special characters.
 const demoStudentsByCourse: Record<string, Student[]> = {
-  'demo-cur-antenna-basics-2026': [
+  'otm-e534066a-d0e9-49b1-9208-62805f4d64c4': [
     student('qbnrmwktl4', 'Aino', 'Virtanen', '014203877'),
     student('zhfdpxsva7', 'Eero', 'Nieminen', '015118420'),
     student('mwkqljnzb2', 'Sofia Maria', 'Mäkinen', '014977201'),
@@ -82,7 +84,7 @@ const demoStudentsByCourse: Record<string, Student[]> = {
     student('ndklfqwmz3', 'Helmi', 'Järvinen', '014660514'),
     student('vbghtrjpl6', 'Väinö', 'Laine', '015809333'),
   ],
-  'demo-cur-yagi-design-2026': [
+  'hy-opt-cur-2526-e435f40e-4faa-4140-96b6-e77a2e161b06': [
     student('xkmwqzdfn1', 'Ilona', 'Heikkinen', '014501982'),
     student('rplsvnktb8', 'Leo', 'Hämäläinen', '015274610'),
     student('jhcgwmqxz5', 'Venla', 'Koskinen', '014938745'),
@@ -90,7 +92,7 @@ const demoStudentsByCourse: Record<string, Student[]> = {
     student('dscjmwqzv1', 'Aada', 'Saarinen', '014712559'),
     student('ktblrnphw4', 'Niilo', 'Salminen', '015487103'),
   ],
-  'demo-cur-hf-propagation-2026': [
+  'hy-opt-cur-2526-b8ec1422-835b-4bdb-bd2c-25df506de0f8': [
     student('gwmxzqfdn7', 'Lyydia', 'Ojanen', '014355890'),
     student('lpvhrtskb3', 'Akseli', 'Rantanen', '015190467'),
     student('nqzwmfdxk2', 'Iida', 'Halonen', '014824071'),
