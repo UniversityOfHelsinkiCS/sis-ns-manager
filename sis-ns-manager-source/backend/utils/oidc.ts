@@ -1,8 +1,8 @@
 // Applied from the similar usage in /apparaatti
 
 import * as openidClient from 'openid-client'
-import passport from 'passport'
 
+import type { User } from '../../common/types.ts'
 import {
   OIDC_ISSUER,
   OIDC_CLIENT_ID,
@@ -10,22 +10,20 @@ import {
   OIDC_REDIRECT_URI,
 } from './config.ts'
 
-
-
-const params = {
+export const params = {
   scope: 'openid profile',
   claims: {
     id_token: {
       uid: { essential: true },
-      username: {essential: true},
+      username: { essential: true },
       hyPersonSisuId: { essential: true },
       hyGroupCn: { essential: true },
     },
   },
 }
 
-const getClient = async () => {
-  const issuer = await  openidClient.Issuer.discover(OIDC_ISSUER)
+export const getClient = async () => {
+  const issuer = await openidClient.Issuer.discover(OIDC_ISSUER)
 
   const client = new issuer.Client({
     client_id: OIDC_CLIENT_ID,
@@ -33,6 +31,24 @@ const getClient = async () => {
     redirect_uris: [OIDC_REDIRECT_URI],
     response_types: ['code'],
   })
-  
+
   return client
+}
+
+// Maps the OIDC provider's claims onto our User. No DB upsert: with the
+// cookie-only session the whole user object is stored in the session, so there
+// is nothing to persist server-side.
+export const verifyLogin = async (
+  _tokenSet: unknown,
+  userinfo: Record<string, unknown>,
+  done: (err: unknown, user?: User) => void,
+) => {
+  const user: User = {
+    id: userinfo.hyPersonSisuId as string,
+    username: userinfo.uid as string,
+    hyPersonSisuId: userinfo.hyPersonSisuId as string,
+    hyGroupCn: (userinfo.hyGroupCn as string[]) ?? null,
+  }
+
+  return done(null, user)
 }

@@ -6,7 +6,6 @@ export const mockUser: User = {
   id: 'hy-hlo-12345',
   username: DEV_PERSON_NAME,
   hyPersonSisuId: DEV_PERSON_ID,
-  email: 'example-toska@helsinki.fi',
   hyGroupCn: ['grp-okd-teachers'],
 }
 
