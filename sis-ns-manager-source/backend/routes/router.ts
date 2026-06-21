@@ -4,20 +4,17 @@ import okdRouter from './okd.ts'
 import passport from 'passport'
 import type { User } from '../../common/types.ts'
 import { isAllowed } from '../utils/validations.ts'
+import requireUser from '../middleware/requireUser.ts'
 
 
 const router = express.Router({mergeParams: true})
 
 router.use(express.json())
 
-router.use('/sis', sisRouter)
-router.use('/okd', okdRouter)
+router.use('/sis', requireUser, sisRouter)
+router.use('/okd', requireUser, okdRouter)
 
-router.get('/user', (req, res) => {
-  if (!req.user) {
-    res.status(401).json({ message: 'Unauthorized' })
-    return
-  }
+router.get('/user', requireUser, (req, res) => {
   const user = req.user as User
   const returnData: User = {
     ...user,
@@ -35,12 +32,7 @@ router.get('/login/callback',
   }
 )
 
-router.get('/logout', async (req, res, next) => {
-  if (!req.user) {
-    res.status(401).json({ message: 'Unauthorized' })
-    return
-  }
-
+router.get('/logout', requireUser, async (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err)
     res.redirect('/')

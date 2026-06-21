@@ -45,7 +45,15 @@ export default function App() {
             <span className="app-header__title">sis-namespace-manager</span>
           </div>
           {username && (
-            <span className="app-header__user">Logged in as: {username}</span>
+            <div className="app-header__account">
+              <span className="app-header__user">Logged in as: {username}</span>
+              <button
+                className="btn btn--primary btn--sm"
+                onClick={() => { window.location.href = '/api/logout' }}
+              >
+                Log out
+              </button>
+            </div>
           )}
         </div>
       </header>
