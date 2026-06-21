@@ -32,20 +32,6 @@
   gap: 12px;
 }
 
-.login-notice {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 64px 0;
-}
-
-.login-notice__text {
-  font-size: 16px;
-  color: #424242;
-  margin: 0;
-}
-
 .app-header__user {
   font-size: 13px;
   color: #757575;
