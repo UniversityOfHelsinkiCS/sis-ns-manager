@@ -65,16 +65,22 @@ export const demoCourses: CourseUnitRealisation[] = [
 ]
 
 function student(
-  eduPersonPrincipalName: string,
+  uid: string,
   firstNames: string,
   lastName: string,
   studentNumber: string,
 ): Student {
-  return { eduPersonPrincipalName, firstNames, lastName, studentNumber }
+  return {
+    eduPersonPrincipalName: `${uid}@helsinki.fi`,
+    firstNames,
+    lastName,
+    studentNumber,
+  }
 }
 
-// Usernames (eduPersonPrincipalName) are random 10-character strings: nine
-// lowercase letters followed by a digit. No special characters.
+// The uid passed to student() is a random 10-character string: nine lowercase
+// letters followed by a digit (no special characters). eduPersonPrincipalName
+// is then `<uid>@helsinki.fi`, matching the real SIS email form.
 const demoStudentsByCourse: Record<string, Student[]> = {
   'otm-e534066a-d0e9-49b1-9208-62805f4d64c4': [
     student('qbnrmwktl4', 'Aino', 'Virtanen', '014203877'),
@@ -104,4 +110,11 @@ const demoStudentsByCourse: Record<string, Student[]> = {
 
 export function getDemoStudents(courseId: string): Student[] {
   return demoStudentsByCourse[courseId] ?? []
+}
+
+export function getDemoStudentsByNumbers(studentNumbers: string[]): Student[] {
+  const wanted = new Set(studentNumbers)
+  return Object.values(demoStudentsByCourse)
+    .flat()
+    .filter((student) => wanted.has(student.studentNumber))
 }
