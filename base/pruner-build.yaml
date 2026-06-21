@@ -33,6 +33,8 @@ spec:
   strategy:
     dockerStrategy:
       dockerfilePath: Dockerfile
+      pullSecret:
+        name: dockerhub-regcred
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
