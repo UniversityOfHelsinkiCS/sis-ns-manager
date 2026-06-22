@@ -41,10 +41,16 @@ app.use(passport.session())
 
 // Passport wiring: serializers + the 'oidc' strategy registered on the global
 // passport singleton. The whole user object is stored in the session.
-const client = await getClient()
 passport.serializeUser((user, done) => done(null, user))
 passport.deserializeUser((user: Express.User, done) => done(null, user))
-passport.use('oidc', new openidClient.Strategy({ client, params: oidcParams }, verifyLogin))
+
+// OIDC discovery only runs in production. Local runs have no secrets (and use
+// the mock user instead), and discovering an empty issuer crashes inside
+// openid-client, so skip the strategy entirely outside production.
+if (inProduction) {
+  const client = await getClient()
+  passport.use('oidc', new openidClient.Strategy({ client, params: oidcParams }, verifyLogin))
+}
 
 if (inDevelopment) {
   app.use(mockUserMiddleware)

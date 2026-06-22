@@ -1,6 +1,5 @@
 import express from 'express'
 import type { User } from '../../common/types.ts'
-import { isAllowed } from '../utils/validations.ts'
 import { getCourse, getStudentsByNumbers } from '../utils/sisService.ts'
 import {
   PROVISIONER_ANNOTATION,
@@ -8,18 +7,14 @@ import {
   listNamespacesByAnnotation,
   createProject,
   patchNamespaceAnnotations,
-  getNamespaceProvisioner,
   grantNamespaceAdmin,
 } from '../utils/okdClient.ts'
+import requireAllowed from '../middleware/requireAllowed.ts'
+import requireNamespaceOwner from '../middleware/requireNamespaceOwner.ts'
 
 const okdRouter = express.Router()
 
 const toDateString = (d: Date) => d.toISOString().slice(0, 10)
-
-// True only when the namespace was provisioned through this app by this user,
-// so a caller cannot mutate namespaces they do not own.
-const ownsNamespace = async (userId: string, name: string) =>
-  (await getNamespaceProvisioner(name)) === userId
 
 // GET /api/okd/namespaces — namespaces provisioned by the current user.
 okdRouter.get('/namespaces', async (req, res) => {
@@ -38,13 +33,8 @@ okdRouter.get('/namespaces', async (req, res) => {
 // POST /api/okd/namespaces/:id — self-provision the namespace :id for a course.
 // The course (looked up by body.courseId) supplies the end date, which is
 // stamped as an annotation for the pruner to act on.
-okdRouter.post('/namespaces/:id', async (req, res) => {
+okdRouter.post('/namespaces/:id', requireAllowed, async (req, res) => {
   const user = req.user as User
-  if (!isAllowed(user)) {
-    res.status(403).json({ message: 'Forbidden' })
-    return
-  }
-
   const name = req.params.id
   const { courseId } = req.body as { courseId?: string }
   if (!courseId) {
@@ -71,18 +61,8 @@ okdRouter.post('/namespaces/:id', async (req, res) => {
 
 // DELETE /api/okd/namespaces/:id — schedule deletion by setting the end date to
 // tomorrow, so the pruner removes the namespace on its next run.
-okdRouter.delete('/namespaces/:id', async (req, res) => {
-  const user = req.user as User
-  if (!isAllowed(user)) {
-    res.status(403).json({ message: 'Forbidden' })
-    return
-  }
-
+okdRouter.delete('/namespaces/:id', [requireAllowed, requireNamespaceOwner], async (req, res) => {
   const name = req.params.id
-  if (!(await ownsNamespace(user.id, name))) {
-    res.status(403).json({ message: 'Not your namespace' })
-    return
-  }
 
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
@@ -96,18 +76,9 @@ okdRouter.delete('/namespaces/:id', async (req, res) => {
 // POST /api/okd/namespaces/:id/users — grant the given students admin in the
 // namespace. Students are identified by student number; their uid is derived
 // from eduPersonPrincipalName (the part before '@').
-okdRouter.post('/namespaces/:id/users', async (req, res) => {
+okdRouter.post('/namespaces/:id/users', [requireAllowed, requireNamespaceOwner], async (req, res) => {
   const user = req.user as User
-  if (!isAllowed(user)) {
-    res.status(403).json({ message: 'Forbidden' })
-    return
-  }
-
   const name = req.params.id
-  if (!(await ownsNamespace(user.id, name))) {
-    res.status(403).json({ message: 'Not your namespace' })
-    return
-  }
 
   const { studentNumbers } = req.body as { studentNumbers?: string[] }
   if (!Array.isArray(studentNumbers) || studentNumbers.length === 0) {

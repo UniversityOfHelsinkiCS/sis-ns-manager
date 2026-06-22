@@ -9,7 +9,7 @@
     "dev-back": "tsx watch backend/index.ts",
     "build": "vite build",
     "start": "NODE_ENV=production node --experimental-strip-types backend/index.ts",
-    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "lint": "eslint './**/*.{ts,tsx}'",
     "preview": "vite preview"
   },
   "dependencies": {

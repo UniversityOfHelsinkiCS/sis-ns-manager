@@ -106,7 +106,7 @@ export const grantNamespaceAdmin = async (
     const body = {
       apiVersion: 'rbac.authorization.k8s.io/v1',
       kind: 'RoleBinding',
-      metadata: { name: `sis-ns-manager-admin-${username}`, namespace },
+      metadata: { name: `sis-ns-manager-admin-  `, namespace },
       roleRef: {
         apiGroup: 'rbac.authorization.k8s.io',
         kind: 'ClusterRole',

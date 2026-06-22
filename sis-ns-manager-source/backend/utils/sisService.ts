@@ -7,6 +7,20 @@ import { demoCourses, getDemoStudents, getDemoStudentsByNumbers } from './demoDa
 
 const api = axios.create({ baseURL: DATABASE_URL })
 
+// Whitelist the fields we expose: destructuring drops any extra properties the
+// SIS API may attach to a student record.
+const toStudent = ({
+  eduPersonPrincipalName,
+  firstNames,
+  lastName,
+  studentNumber,
+}: Student): Student => ({
+  eduPersonPrincipalName,
+  firstNames,
+  lastName,
+  studentNumber,
+})
+
 export const getCourses = async (user: User): Promise<CourseUnitRealisation[]> => {
   if (isDemoUser(user)) return demoCourses
 
@@ -31,7 +45,7 @@ export const getStudents = async (
   if (isDemoUser(user)) return getDemoStudents(courseId)
 
   const { data } = await api.get(`/course_unit_realisations/${courseId}/enrolments`)
-  return data.map((e: { student: unknown }) => e.student)
+  return data.map((e: { student: Student }) => toStudent(e.student))
 }
 
 // Looks up full person records by student number (POST /students). The returned
@@ -43,5 +57,5 @@ export const getStudentsByNumbers = async (
   if (isDemoUser(user)) return getDemoStudentsByNumbers(studentNumbers)
 
   const { data } = await api.post('/students', { studentNumbers })
-  return data
+  return (data as Student[]).map(toStudent)
 }
