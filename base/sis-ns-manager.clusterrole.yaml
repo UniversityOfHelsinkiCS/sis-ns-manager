@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: sis-ns-manager
+  name: sis-ns-manager-argo
 rules:
   - apiGroups:
       - image.openshift.io
@@ -46,3 +46,17 @@ rules:
       - delete
       - update
       - patch
+--- 
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-clusterrole
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - patch
