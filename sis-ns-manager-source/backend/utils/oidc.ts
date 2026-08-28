@@ -43,6 +43,12 @@ export const verifyLogin = async (
   userinfo: Record<string, unknown>,
   done: (err: unknown, user?: User) => void,
 ) => {
+
+  console.log('--- verifyLogin _tokenSet ---')
+  console.log(JSON.stringify(_tokenSet, null, 2))
+  console.log('--- verifyLogin userinfo ---')
+  console.log(JSON.stringify(userinfo, null, 2))
+
   const user: User = {
     id: userinfo.hyPersonSisuId as string,
     username: userinfo.uid as string,

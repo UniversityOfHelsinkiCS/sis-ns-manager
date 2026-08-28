@@ -39,4 +39,4 @@ router.get('/logout', requireUser, (req, res, next) => {
   })
 })
 
-export default router
+export default router 

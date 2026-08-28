@@ -42,7 +42,7 @@ app.use(passport.session())
 // Passport wiring: serializers + the 'oidc' strategy registered on the global
 // passport singleton. The whole user object is stored in the session.
 passport.serializeUser((user, done) => done(null, user))
-passport.deserializeUser((user: Express.User, done) => done(null, user))
+passport.deserializeUser((userObj: Express.User, done) => done(null, userObj))
 
 // OIDC discovery only runs in production. Local runs have no secrets (and use
 // the mock user instead), and discovering an empty issuer crashes inside
@@ -65,7 +65,7 @@ app.use('/api', (_, res) => {
   res.sendStatus(404)
 })
 
-if (process.env.NODE_ENV === 'production') {
+if (inProduction) {
   const __dirname = path.dirname(fileURLToPath(import.meta.url))
   const distPath = path.join(__dirname, '..', 'frontend', 'dist')
   app.use(express.static(distPath))
