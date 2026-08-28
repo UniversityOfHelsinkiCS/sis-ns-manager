@@ -1,11 +1,16 @@
 import axios from 'axios'
 
 import type { CourseUnitRealisation, Student, User } from '../../common/types.ts'
-import { DATABASE_URL } from './config.ts'
+import { DATABASE_URL, API_TOKEN } from './config.ts'
 import { isDemoUser } from './validations.ts'
 import { demoCourses, getDemoStudents, getDemoStudentsByNumbers } from './demoData.ts'
 
-const api = axios.create({ baseURL: DATABASE_URL })
+const api = axios.create({ 
+  baseURL: DATABASE_URL,
+  params: {
+    token: API_TOKEN,
+  }
+})
 
 // Whitelist the fields we expose: destructuring drops any extra properties the
 // SIS API may attach to a student record.

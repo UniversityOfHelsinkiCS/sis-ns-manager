@@ -19,6 +19,12 @@ export const oidcParams = {
       hyPersonSisuId: { essential: true },
       hyGroupCn: { essential: true },
     },
+    userinfo: {
+      uid: { essential: true },
+      username: { essential: true },
+      hyPersonSisuId: { essential: true },
+      hyGroupCn: { essential: true },
+    },
   },
 }
 
