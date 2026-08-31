@@ -17,13 +17,13 @@ router.use('/okd', requireUser, okdRouter)
 router.get('/user', requireUser, (req, res) => {
   const user = req.user as User
   const returnData: User = {
-    ...user,
+    user.username,
     isAllowed: isAllowed(user),
   }
   res.json(returnData)
 })
 
-router.get('/login', passport.authenticate('oidc'))
+router.get('/login', passport.authenticate('oidc')) 
 
 router.get('/login/callback',
   passport.authenticate('oidc', { failureRedirect: '/' }),
@@ -35,7 +35,7 @@ router.get('/login/callback',
 router.get('/logout', requireUser, (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err)
-    res.redirect('/')
+    res.redirect('/') 
   })
 })
 

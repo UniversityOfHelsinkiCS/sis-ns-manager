@@ -8,7 +8,7 @@ import { demoCourses, getDemoStudents, getDemoStudentsByNumbers } from './demoDa
 const api = axios.create({ 
   baseURL: DATABASE_URL,
   params: {
-    token: API_TOKEN,
+    token: API_TOKEN,  
   }
 })
 
