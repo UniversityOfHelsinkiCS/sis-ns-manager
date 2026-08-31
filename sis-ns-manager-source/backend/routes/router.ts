@@ -16,8 +16,8 @@ router.use('/okd', requireUser, okdRouter)
 
 router.get('/user', requireUser, (req, res) => {
   const user = req.user as User
-  const returnData: User = {
-    user.username,
+  const returnData = {
+    username: user.username,
     isAllowed: isAllowed(user),
   }
   res.json(returnData)
