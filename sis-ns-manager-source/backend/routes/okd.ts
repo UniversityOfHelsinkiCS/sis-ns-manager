@@ -48,11 +48,13 @@ okdRouter.post('/namespaces/:id', requireAllowed, async (req, res) => {
     return
   }
 
-  const endDate = toDateString(new Date(course.activityPeriod.endDate as string))
+  const courseEndDate = new Date(course.activityPeriod.endDate as string)
+  courseEndDate.setDate(courseEndDate.getDate() + 60)
+  const endDate = toDateString(courseEndDate)
 
   await createProject(name, name)
   await patchNamespaceAnnotations(name, {
-    [PROVISIONER_ANNOTATION]: user.id,
+    [PROVISIONER_ANNOTATION]: user.id, // fix to username
     [END_DATE_ANNOTATION]: endDate,
   })
 

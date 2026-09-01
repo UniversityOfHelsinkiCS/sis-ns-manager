@@ -12,7 +12,7 @@ const requireNamespaceOwner = async (
   const user = req.user as User
   const name = req.params.id
 
-  if ((await getNamespaceProvisioner(name)) !== user.id) {
+  if ((await getNamespaceProvisioner(name)) !== user.id) { // fix also here 
     res.status(403).json({ message: 'Not your namespace' })
     return
   }

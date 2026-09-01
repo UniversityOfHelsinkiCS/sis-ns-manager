@@ -23,7 +23,7 @@ if (inProduction) app.set('trust proxy', 1)
 // 8 hour lifetime.
 app.use(
   session({
-    store: new RedisStore({ client: redis }),
+    store: inProduction ? new RedisStore({ client: redis }) : undefined,
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,

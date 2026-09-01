@@ -6,4 +6,5 @@ export const redis = new Redis({
   host: REDIS_HOST,
   port: 6379,
   password: REDIS_PASSWORD || undefined,
+  lazyConnect: true,
 })

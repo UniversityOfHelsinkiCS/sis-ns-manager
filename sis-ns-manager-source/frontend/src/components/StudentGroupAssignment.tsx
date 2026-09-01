@@ -57,6 +57,7 @@ export function StudentGroupAssignment({ students, groupCount, assignment, onCha
                     onChange={e => setGroup(s.studentNumber, Number(e.target.value))}
                     aria-label={`Move ${`${s.firstNames.split(' ')[0]} ${s.lastName}`} to group`}
                   >
+                    <option value={0}>— unassign</option>
                     {groups.map(opt => (
                       <option key={opt} value={opt}>→ {opt}</option>
                     ))}

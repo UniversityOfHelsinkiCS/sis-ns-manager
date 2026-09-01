@@ -36,12 +36,14 @@ export function CourseCard({ course }: Props) {
     })
 
   const isActive = existingNamespaces.length > 0
-  const courseNs = existingNamespaces.find(n => n.type === 'course')
-  const activeUntilDate = courseNs?.activeUntil
-    ? new Date(courseNs.activeUntil)
-    : getActiveUntil(course)
+  // Displayed to the user as the namespace's active-until date, always 30 days
+  // past the course end — the real annotation (used by the pruner) is set 60
+  // days past course end, giving a 30-day grace window where the namespace
+  // still exists but is hidden from the UI below.
+  const activeUntilDate = getActiveUntil(course)
   const activeUntil = formatDate(activeUntilDate)
   const pastCourseEnd = new Date() > getCourseEndDate(course)
+  const hidden = isActive && new Date() > activeUntilDate
 
   const [open, setCreateOpen] = useState(false)
   const [manageOpen, setManageOpen] = useState(false)
@@ -53,6 +55,8 @@ export function CourseCard({ course }: Props) {
     setStudents(data)
     setCreateOpen(true)
   }
+
+  if (hidden) return null
 
   const displayName = (course.name.fi ?? course.name.en ?? course.id) as string
   const startYear = new Date(course.activityPeriod.startDate as string).getFullYear()

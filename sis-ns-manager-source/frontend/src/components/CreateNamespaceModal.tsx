@@ -3,6 +3,7 @@ import type { CourseUnitRealisation, Student, GroupAssignment } from '@common/ty
 import { StudentGroupAssignment, autoAssign } from './StudentGroupAssignment'
 import { Modal } from './Modal'
 import { createNamespace, addNamespaceUsers, errorMessage } from '../util/okdApi'
+import { getActiveUntil, formatDate } from '../utils'
 
 interface Props {
   course: CourseUnitRealisation
@@ -33,15 +34,14 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
         await createNamespace(nsName, course.id)
       } else {
         for (let group = 1; group <= groupCount; group++) {
-          const groupNs = `${nsName}-group-${group}`
-          await createNamespace(groupNs, course.id)
-
           const studentNumbers = students
             .filter(s => assignment[s.studentNumber] === group)
             .map(s => s.studentNumber)
-          if (studentNumbers.length > 0) {
-            await addNamespaceUsers(groupNs, studentNumbers)
-          }
+          if (studentNumbers.length === 0) continue
+
+          const groupNs = `${nsName}-group-${group}`
+          await createNamespace(groupNs, course.id)
+          await addNamespaceUsers(groupNs, studentNumbers)
         }
       }
       onCreated()
@@ -52,12 +52,18 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
   }
 
   const displayName = (course.name.fi ?? course.name.en ?? course.id) as string
+  const nonEmptyGroupCount = Array.from({ length: groupCount }, (_, i) => i + 1)
+    .filter(g => students.some(s => assignment[s.studentNumber] === g)).length
 
   return (
     <Modal title="Create namespace" onClose={onClose}>
       <div className="modal-field">
         <span className="modal-field__label">Course</span>
         <span className="modal-field__text">{displayName}</span>
+      </div>
+      <div className="modal-field">
+        <span className="modal-field__label">Active until</span>
+        <span className="modal-field__text">{formatDate(getActiveUntil(course))}</span>
       </div>
       {!createGroups && (
         <div className="modal-field">
@@ -125,12 +131,12 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
         <button
           className="btn btn--primary"
           onClick={handleCreate}
-          disabled={loading}
+          disabled={loading || (createGroups && nonEmptyGroupCount === 0)}
         >
           {loading
             ? 'Creating…'
             : createGroups
-            ? `Create ${groupCount} group namespace${groupCount !== 1 ? 's' : ''}`
+            ? `Create ${nonEmptyGroupCount} group namespace${nonEmptyGroupCount !== 1 ? 's' : ''}`
             : 'Create namespace'}
         </button>
       </div>

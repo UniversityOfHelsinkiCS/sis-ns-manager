@@ -4,8 +4,11 @@ export const DATABASE_URL = process.env.SIS_API_URL || ''
 export const API_TOKEN = process.env.API_TOKEN || ''
 export const inProduction = process.env.NODE_ENV === 'production' || false
 export const inDevelopment = process.env.NODE_ENV === 'development'
-export const DEV_PERSON_NAME = process.env.DEV_PERSON_NAME || 'test-user'
 export const DEV_PERSON_ID = process.env.DEV_PERSON_ID || 'hy-hlo-12345'
+
+export const OKD_TEACHERS_GROUP = process.env.OKD_TEACHERS_GROUP || 'grp-okd-teachers'
+// TODO: replace with the real demo account username once known.
+export const DEMO_USER_USERNAME = process.env.DEMO_USER_USERNAME || 'lztest'
 
 
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret'

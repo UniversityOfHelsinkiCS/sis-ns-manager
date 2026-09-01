@@ -11,6 +11,24 @@ REQUESTER = "sis-ns-manager"
 PROVISIONER_ANNOTATION = "sis-ns-manager/provisioner"
 END_DATE_ANNOTATION = "sis-ns-manager/endDate"
 
+# Cluster-infrastructure namespaces that must never be pruned, regardless of
+# what labels or annotations they carry. This is a hard denylist that overrides
+# is_managed(); it exists so a mislabelled system namespace can never be caught
+# by the pruner.
+PROTECTED_NAMESPACES = frozenset(
+    {"default", "kube-system", "kube-public", "kube-node-lease"}
+)
+PROTECTED_PREFIXES = ("kube-", "openshift-")
+
+
+def is_protected(name) -> bool:
+    """Return True for OpenShift/Kubernetes system namespaces."""
+    return (
+        name in PROTECTED_NAMESPACES
+        or name == "openshift"
+        or name.startswith(PROTECTED_PREFIXES)
+    )
+
 
 def load_kube_config() -> None:
     try:
@@ -26,6 +44,8 @@ def is_managed(ns) -> bool:
     cluster. Changing the criteria is destructive and can lead to unintended
     namespaces getting destroyed.
     """
+    if is_protected(ns.metadata.name):
+        return False
     labels = ns.metadata.labels or {}
     annotations = ns.metadata.annotations or {}
     return (
@@ -47,6 +67,10 @@ def main() -> None:
     failures = 0
     for ns in managed:
         name = ns.metadata.name
+        # Redundant with is_managed(), kept as a last line of defence right next
+        # to the destructive call.
+        if is_protected(name):
+            print(f"{name}: protected system namespace, skipping")
         end_date_str = (ns.metadata.annotations or {}).get(END_DATE_ANNOTATION)
         if not end_date_str:
             print(f"{name}: missing {END_DATE_ANNOTATION} annotation, skipping")

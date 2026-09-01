@@ -43,16 +43,16 @@ export const demoCourses: CourseUnitRealisation[] = [
     'otm-e534066a-d0e9-49b1-9208-62805f4d64c4',
     'Full Stack -websovelluskehitys harjoitustyö',
     'Full Stack Web Development Project',
-    '2026-06-01',
-    '2026-08-31',
+    '2026-12-01',
+    '2027-02-28',
   ),
   // TKT20019
   demoCourse(
     'hy-opt-cur-2526-e435f40e-4faa-4140-96b6-e77a2e161b06',
     'Tietokannat ja web-ohjelmointi',
     'Databases and Web Programming',
-    '2026-05-04',
-    '2026-06-30',
+    '2026-11-04',
+    '2026-12-30',
   ),
   // CSM13001
   demoCourse(

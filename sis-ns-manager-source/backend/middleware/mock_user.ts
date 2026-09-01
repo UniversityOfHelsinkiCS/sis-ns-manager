@@ -1,12 +1,12 @@
 import type { Request, Response, NextFunction } from 'express'
 import type { User } from '../../common/types.ts'
-import { DEV_PERSON_ID, DEV_PERSON_NAME } from '../utils/config.ts'
+import { DEV_PERSON_ID, DEMO_USER_USERNAME, OKD_TEACHERS_GROUP } from '../utils/config.ts'
 
 export const mockUser: User = {
   id: 'hy-hlo-12345',
-  username: DEV_PERSON_NAME,
+  username: DEMO_USER_USERNAME,
   hyPersonSisuId: DEV_PERSON_ID,
-  hyGroupCn: ['grp-okd-teachers'],
+  hyGroupCn: [OKD_TEACHERS_GROUP],
 }
 
 const mockUserMiddleware = (req: Request, _: Response, next: NextFunction) => {
