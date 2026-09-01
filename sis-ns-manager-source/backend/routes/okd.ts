@@ -19,7 +19,7 @@ const toDateString = (d: Date) => d.toISOString().slice(0, 10)
 // GET /api/okd/namespaces — namespaces provisioned by the current user.
 okdRouter.get('/namespaces', async (req, res) => {
   const user = req.user as User
-  const namespaces = await listNamespacesByAnnotation(PROVISIONER_ANNOTATION, user.id)
+  const namespaces = await listNamespacesByAnnotation(PROVISIONER_ANNOTATION, user.username)
 
   res.json(
     namespaces.map((ns) => ({
@@ -54,7 +54,7 @@ okdRouter.post('/namespaces/:id', requireAllowed, async (req, res) => {
 
   await createProject(name, name)
   await patchNamespaceAnnotations(name, {
-    [PROVISIONER_ANNOTATION]: user.id, // fix to username
+    [PROVISIONER_ANNOTATION]: user.username,
     [END_DATE_ANNOTATION]: endDate,
   })
 

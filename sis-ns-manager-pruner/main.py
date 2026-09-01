@@ -6,7 +6,7 @@ from kubernetes import client, config
 
 SELF_PROVISIONED_LABEL = "self-provisioned"
 REQUESTER_ANNOTATION = "openshift.io/requester"
-REQUESTER = "sis-ns-manager"
+REQUESTER = "system:serviceaccount:sis-ns-manager:manager"
 # Must match backend/utils/okdClient.ts
 PROVISIONER_ANNOTATION = "sis-ns-manager/provisioner"
 END_DATE_ANNOTATION = "sis-ns-manager/endDate"
