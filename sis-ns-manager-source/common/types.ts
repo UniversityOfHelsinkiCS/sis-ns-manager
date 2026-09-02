@@ -42,8 +42,8 @@ export interface CourseUnitRealisation {
 }
 
 export type User = {
+  // hyPersonSisuId from the OIDC claims
   id: string
   username: string
-  hyPersonSisuId: string
   hyGroupCn: string[] | null
 }

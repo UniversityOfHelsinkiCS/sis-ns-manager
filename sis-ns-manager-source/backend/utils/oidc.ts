@@ -15,13 +15,11 @@ export const oidcParams = {
   claims: {
     id_token: {
       uid: { essential: true },
-      username: { essential: true },
       hyPersonSisuId: { essential: true },
       hyGroupCn: { essential: true },
     },
     userinfo: {
       uid: { essential: true },
-      username: { essential: true },
       hyPersonSisuId: { essential: true },
       hyGroupCn: { essential: true },
     },
@@ -53,7 +51,6 @@ export const verifyLogin = async (
   const user: User = {
     id: userinfo.hyPersonSisuId as string,
     username: userinfo.uid as string,
-    hyPersonSisuId: userinfo.hyPersonSisuId as string,
     hyGroupCn: (userinfo.hyGroupCn as string[]) ?? null,
   }
 

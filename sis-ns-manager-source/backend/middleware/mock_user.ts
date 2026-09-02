@@ -3,9 +3,8 @@ import type { User } from '../../common/types.ts'
 import { DEV_PERSON_ID, DEMO_USER_USERNAME, OKD_TEACHERS_GROUP } from '../utils/config.ts'
 
 export const mockUser: User = {
-  id: 'hy-hlo-12345',
+  id: DEV_PERSON_ID,
   username: DEMO_USER_USERNAME,
-  hyPersonSisuId: DEV_PERSON_ID,
   hyGroupCn: [OKD_TEACHERS_GROUP],
 }
 

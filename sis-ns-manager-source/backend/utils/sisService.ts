@@ -30,7 +30,7 @@ export const getCourses = async (user: User): Promise<CourseUnitRealisation[]> =
   if (isDemoUser(user)) return demoCourses
 
   const { data } = await api.get(
-    `/employees/${user.hyPersonSisuId}/course_unit_realisations`,
+    `/employees/${user.id}/course_unit_realisations`,
   )
   return data
 }

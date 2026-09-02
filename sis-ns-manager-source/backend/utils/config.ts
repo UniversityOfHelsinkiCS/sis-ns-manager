@@ -7,6 +7,9 @@ export const inDevelopment = process.env.NODE_ENV === 'development'
 export const DEV_PERSON_ID = process.env.DEV_PERSON_ID || 'hy-hlo-12345'
 
 export const OKD_TEACHERS_GROUP = process.env.OKD_TEACHERS_GROUP || 'grp-okd-teachers'
+// Name of the cluster this instance manages, shown in the frontend UI. Set per
+// deployment overlay; falls back to a dev-friendly placeholder locally.
+export const CLUSTER_NAME = process.env.CLUSTER_NAME || 'local'
 // TODO: replace with the real demo account username once known.
 export const DEMO_USER_USERNAME = process.env.DEMO_USER_USERNAME || 'lztest'
 
