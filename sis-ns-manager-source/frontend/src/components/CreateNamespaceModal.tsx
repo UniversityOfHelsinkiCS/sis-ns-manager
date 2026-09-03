@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { CourseUnitRealisation, Student, GroupAssignment } from '@common/types'
-import { StudentGroupAssignment, autoAssign } from './StudentGroupAssignment'
+import { StudentGroupAssignment } from './StudentGroupAssignment'
 import { Modal } from './Modal'
 import { createNamespace, addNamespaceUsers, errorMessage } from '../util/okdApi'
 import { getActiveUntil, formatDate, validateNsName } from '../utils'
@@ -15,13 +15,15 @@ interface Props {
 
 const INITIAL_GROUPS = 4
 
-// Names for groups 1..count, keeping any the user already edited.
+// Fill in default names for groups 1..count, keeping every name the user has
+// already edited (including ones above the current count, so lowering then
+// raising the count doesn't lose them).
 const buildGroupNames = (
   base: string,
   count: number,
   prev: Record<number, string> = {},
 ): Record<number, string> => {
-  const next: Record<number, string> = {}
+  const next: Record<number, string> = { ...prev }
   for (let g = 1; g <= count; g++) next[g] = prev[g] ?? `${base}-${g}`
   return next
 }
@@ -44,7 +46,14 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
   function handleGroupCountChange(count: number) {
     const n = Math.max(1, Math.min(99, count))
     setGroupCount(n)
-    setAssignment(autoAssign(students, n))
+    // Keep existing assignments; only students in a group that no longer exists
+    // fall back to unassigned. Never silently (re-)assign the whole class — that
+    // is only ever done by the explicit "Auto-assign evenly" button.
+    setAssignment(prev => {
+      const next: GroupAssignment = {}
+      for (const [id, g] of Object.entries(prev)) next[id] = g > n ? 0 : g
+      return next
+    })
     setGroupNames(prev => buildGroupNames(nsName, n, prev))
   }
 
