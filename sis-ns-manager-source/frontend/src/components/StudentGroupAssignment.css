@@ -115,18 +115,23 @@
 
 .sga__student-name {
   color: #212121;
+  font-family: ui-monospace, Consolas, monospace;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-  flex: 1;
+  flex: 1 1 auto;
 }
 
-.sga__student-number {
-  font-family: ui-monospace, Consolas, monospace;
+.sga__student-fullname {
   font-size: 11px;
   color: #9e9e9e;
-  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1 1 auto;
+  text-align: right;
 }
 
 .sga__student-select {

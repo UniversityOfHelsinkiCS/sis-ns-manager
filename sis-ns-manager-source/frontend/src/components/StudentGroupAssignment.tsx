@@ -8,6 +8,14 @@ interface Props {
   onChange: (assignment: GroupAssignment) => void
 }
 
+// The uid (part of eduPersonPrincipalName before '@') — the same identifier the
+// backend grants namespace access to. Falls back to the student number.
+const username = (s: Student) =>
+  s.eduPersonPrincipalName?.split('@')[0] || s.studentNumber
+
+const fullName = (s: Student) =>
+  [s.firstNames?.split(' ')[0], s.lastName].filter(Boolean).join(' ')
+
 export function autoAssign(students: Student[], groupCount: number): GroupAssignment {
   const result: GroupAssignment = {}
   students.forEach((s, i) => {
@@ -49,13 +57,13 @@ export function StudentGroupAssignment({ students, groupCount, assignment, onCha
             <ul className="sga__student-list">
               {students.filter(s => assignment[s.studentNumber] === g).map(s => (
                 <li key={s.studentNumber} className="sga__student">
-                  <span className="sga__student-name">{`${s.firstNames.split(' ')[0]} ${s.lastName}`}</span>
-                  <span className="sga__student-number">{s.studentNumber}</span>
+                  <span className="sga__student-name">{username(s)}</span>
+                  <span className="sga__student-fullname">{fullName(s)}</span>
                   <select
                     className="sga__student-select"
                     value={assignment[s.studentNumber] ?? 0}
                     onChange={e => setGroup(s.studentNumber, Number(e.target.value))}
-                    aria-label={`Move ${`${s.firstNames.split(' ')[0]} ${s.lastName}`} to group`}
+                    aria-label={`Move ${username(s)} to group`}
                   >
                     <option value={0}>— unassign</option>
                     {groups.map(opt => (
@@ -78,13 +86,13 @@ export function StudentGroupAssignment({ students, groupCount, assignment, onCha
           <ul className="sga__unassigned-list">
             {students.filter(s => !assignment[s.studentNumber]).map(s => (
               <li key={s.studentNumber} className="sga__student">
-                <span className="sga__student-name">{`${s.firstNames.split(' ')[0]} ${s.lastName}`}</span>
-                <span className="sga__student-number">{s.studentNumber}</span>
+                <span className="sga__student-name">{username(s)}</span>
+                <span className="sga__student-fullname">{fullName(s)}</span>
                 <select
                   className="sga__student-select"
                   value={0}
                   onChange={e => setGroup(s.studentNumber, Number(e.target.value))}
-                  aria-label={`Assign ${`${s.firstNames.split(' ')[0]} ${s.lastName}`} to group`}
+                  aria-label={`Assign ${username(s)} to group`}
                 >
                   <option value={0}>— assign</option>
                   {groups.map(opt => (
