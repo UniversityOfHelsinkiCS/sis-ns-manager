@@ -53,8 +53,10 @@ export const getStudents = async (
   return data.map((e: { student: Student }) => toStudent(e.student))
 }
 
-// Looks up full person records by student number (POST /students). The returned
-// records carry eduPersonPrincipalName, from which the uid is derived.
+// Looks up full person records by student number (POST /students). The endpoint
+// wraps each record as { student: {...} } (same shape as the enrolments
+// endpoint). The records carry eduPersonPrincipalName, from which the uid is
+// derived.
 export const getStudentsByNumbers = async (
   user: User,
   studentNumbers: string[],
@@ -62,5 +64,8 @@ export const getStudentsByNumbers = async (
   if (isDemoUser(user)) return getDemoStudentsByNumbers(studentNumbers)
 
   const { data } = await api.post('/students', { studentNumbers })
-  return (data as Student[]).map(toStudent)
+  return (data as { student: Student }[])
+    .map((e) => e.student)
+    .filter(Boolean)
+    .map(toStudent)
 }
