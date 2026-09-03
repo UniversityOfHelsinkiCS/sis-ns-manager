@@ -125,19 +125,20 @@ okdRouter.post('/namespaces/:id/users', [requireAllowed, requireNamespaceOwner],
   }
 
   const students = await getStudentsByNumbers(user, studentNumbers)
-  const usernames = students
-    .map((student) => student.eduPersonPrincipalName?.split('@')[0])
-    .filter((uid): uid is string => Boolean(uid))
 
-  // Guard against silently granting no one: if the caller asked for students but
-  // none resolved to a username, the SIS lookup failed rather than succeeded
-  // with an empty set. Surface it instead of returning a misleading 201.
-  if (usernames.length === 0) {
+  // A non-empty request that resolves to zero SIS records means the lookup
+  // failed rather than succeeded with an empty set — surface it instead of
+  // returning a misleading 201 that grants no one.
+  if (students.length === 0) {
     res.status(502).json({
-      message: 'Could not resolve any of the given students from SIS',
+      message: 'SIS returned no records for the given student numbers',
     })
     return
   }
+
+  const usernames = students
+    .map((student) => student.eduPersonPrincipalName?.split('@')[0])
+    .filter((uid): uid is string => Boolean(uid))
 
   if (!isDemoUser(user)) {
     await grantNamespaceAdmin(name, usernames)
