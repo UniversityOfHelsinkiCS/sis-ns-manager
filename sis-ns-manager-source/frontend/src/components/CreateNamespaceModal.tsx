@@ -66,10 +66,13 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
         <span className="modal-field__text">{formatDate(getActiveUntil(course))}</span>
       </div>
       {!createGroups && (
-        <div className="modal-field">
-          <span className="modal-field__label">Namespace</span>
-          <code className="modal-field__value">{nsName}</code>
-        </div>
+        <>
+          <div className="modal-field">
+            <span className="modal-field__label">Namespace</span>
+            <code className="modal-field__value">{nsName}</code>
+          </div>
+          <p className="modal-note">You'll be added as admin to this namespace.</p>
+        </>
       )}
 
       <label className="modal-checkbox">
@@ -117,6 +120,8 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
               </span>
             )}
           </div>
+
+          <p className="modal-note">You'll be added as admin to each group namespace.</p>
         </div>
       )}
 

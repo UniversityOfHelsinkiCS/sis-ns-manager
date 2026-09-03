@@ -60,3 +60,11 @@ rules:
   - get
   - list
   - patch
+- apiGroups:
+  - "user.openshift.io"
+  resources:
+  - groups
+  verbs:
+  - get
+  - create
+  - patch

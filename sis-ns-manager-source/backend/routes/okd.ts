@@ -9,6 +9,8 @@ import {
   patchNamespaceAnnotations,
   grantNamespaceAdmin,
 } from '../utils/okdClient.ts'
+import { isDemoUser } from '../utils/validations.ts'
+import { demoNamespaces } from '../utils/demoData.ts'
 import requireAllowed from '../middleware/requireAllowed.ts'
 import requireNamespaceOwner from '../middleware/requireNamespaceOwner.ts'
 
@@ -19,6 +21,14 @@ const toDateString = (d: Date) => d.toISOString().slice(0, 10)
 // GET /api/okd/namespaces — namespaces provisioned by the current user.
 okdRouter.get('/namespaces', async (req, res) => {
   const user = req.user as User
+
+  // The demo user has no real cluster; serve a fixed set so the UI (incl. the
+  // Manage modal) can be exercised in development.
+  if (isDemoUser(user)) {
+    res.json(demoNamespaces)
+    return
+  }
+
   const namespaces = await listNamespacesByAnnotation(PROVISIONER_ANNOTATION, user.username)
 
   res.json(
@@ -52,11 +62,21 @@ okdRouter.post('/namespaces/:id', requireAllowed, async (req, res) => {
   courseEndDate.setDate(courseEndDate.getDate() + 60)
   const endDate = toDateString(courseEndDate)
 
+  // Demo user: skip the cluster, report success so the flow can be walked through.
+  if (isDemoUser(user)) {
+    res.status(201).json({ name, endDate })
+    return
+  }
+
   await createProject(name, name)
   await patchNamespaceAnnotations(name, {
     [PROVISIONER_ANNOTATION]: user.username,
     [END_DATE_ANNOTATION]: endDate,
   })
+  // Grant the provisioner admin in the namespace they just created. This covers
+  // both a single course namespace and each group namespace (one POST per
+  // group), so the teacher always has admin on everything they provision.
+  await grantNamespaceAdmin(name, [user.username])
 
   res.status(201).json({ name, endDate })
 })
@@ -64,11 +84,17 @@ okdRouter.post('/namespaces/:id', requireAllowed, async (req, res) => {
 // DELETE /api/okd/namespaces/:id — schedule deletion by setting the end date to
 // tomorrow, so the pruner removes the namespace on its next run.
 okdRouter.delete('/namespaces/:id', [requireAllowed, requireNamespaceOwner], async (req, res) => {
+  const user = req.user as User
   const name = req.params.id
 
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
   const endDate = toDateString(tomorrow)
+
+  if (isDemoUser(user)) {
+    res.json({ name, endDate })
+    return
+  }
 
   await patchNamespaceAnnotations(name, { [END_DATE_ANNOTATION]: endDate })
 
@@ -93,7 +119,9 @@ okdRouter.post('/namespaces/:id/users', [requireAllowed, requireNamespaceOwner],
     .map((student) => student.eduPersonPrincipalName?.split('@')[0])
     .filter((uid): uid is string => Boolean(uid))
 
-  await grantNamespaceAdmin(name, usernames)
+  if (!isDemoUser(user)) {
+    await grantNamespaceAdmin(name, usernames)
+  }
 
   res.status(201).json({ namespace: name, users: usernames })
 })

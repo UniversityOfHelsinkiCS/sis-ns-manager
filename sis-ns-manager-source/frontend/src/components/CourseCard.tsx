@@ -36,14 +36,22 @@ export function CourseCard({ course }: Props) {
     })
 
   const isActive = existingNamespaces.length > 0
-  // Displayed to the user as the namespace's active-until date, always 30 days
-  // past the course end — the real annotation (used by the pruner) is set 60
-  // days past course end, giving a 30-day grace window where the namespace
-  // still exists but is hidden from the UI below.
+  // The default active-until date shown to the user: 30 days past the course
+  // end — the real annotation (used by the pruner) is set 60 days past course
+  // end, giving a 30-day grace window where the namespace still exists but is
+  // hidden from the UI below. A scheduled delete overrides this (see below).
   const activeUntilDate = getActiveUntil(course)
-  const activeUntil = formatDate(activeUntilDate)
   const pastCourseEnd = new Date() > getCourseEndDate(course)
   const hidden = isActive && new Date() > activeUntilDate
+
+  // If a namespace's end-date annotation has been pulled forward before the
+  // normal grace window, a delete is scheduled — surface that (sooner) date
+  // instead, so "Active until" reflects the imminent removal.
+  const scheduledDeletion = existingNamespaces
+    .map((ns) => ns.activeUntil)
+    .filter((d): d is string => Boolean(d) && new Date(d) < activeUntilDate)
+    .sort()[0]
+  const activeUntil = formatDate(scheduledDeletion ?? activeUntilDate)
 
   const [open, setCreateOpen] = useState(false)
   const [manageOpen, setManageOpen] = useState(false)
@@ -83,7 +91,7 @@ export function CourseCard({ course }: Props) {
             </svg>
           </a>
           {isActive && (
-            <span className={`course-card__active-until${pastCourseEnd ? ' course-card__active-until--expired' : ''}`}>
+            <span className={`course-card__active-until${(pastCourseEnd || scheduledDeletion) ? ' course-card__active-until--expired' : ''}`}>
               Active until {activeUntil}
             </span>
           )}
@@ -116,7 +124,7 @@ export function CourseCard({ course }: Props) {
           nsName={nsName}
           namespaces={existingNamespaces}
           onClose={() => setManageOpen(false)}
-          onDeleted={() => { refetch(); setManageOpen(false) }}
+          onDeleted={() => { refetch() }}
         />
       )}
     </>

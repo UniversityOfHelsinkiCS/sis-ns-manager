@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { CourseUnitRealisation } from '@common/types'
 import { CourseCard } from './components/CourseCard'
+import { ADMIN_EMAIL } from './utils'
 import './App.css'
 import useRequiredUser from './util/useRequiredUser'
 import useApi from './util/useApi'
@@ -89,9 +90,7 @@ export default function App() {
               <p className="access-notice__text">
                 Your account does not have privileges to use this application.
                 If you believe this is a mistake, contact{' '}
-                <a href="mailto:grp-okd-cs-admins@helsinki.fi">
-                  grp-okd-cs-admins@helsinki.fi
-                </a>.
+                <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>.
               </p>
             </div>
           ) : hasAccess ? (
@@ -100,6 +99,10 @@ export default function App() {
                 <h1 className="page-header__title">Courses</h1>
                 <p className="page-header__subtitle">
                   Provision Kubernetes namespaces in the OKD cluster for your courses.
+                  {' '}For advanced group management, contact{' '}
+                  <a href={`mailto:${ADMIN_EMAIL}?subject=Advanced group management`}>
+                    {ADMIN_EMAIL}
+                  </a>.
                 </p>
               </div>
 
@@ -110,9 +113,7 @@ export default function App() {
                     No courses are associated with your account. Only courses
                     where you are listed as a responsible in Sisu show up here. If a
                     course is missing, contact{' '}
-                    <a href="mailto:grp-okd-cs-admins@helsinki.fi">
-                      grp-okd-cs-admins@helsinki.fi
-                    </a>.
+                    <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>.
                   </p>
                 </div>
               ) : (

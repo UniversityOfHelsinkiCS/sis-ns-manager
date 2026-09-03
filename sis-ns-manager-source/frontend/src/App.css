@@ -103,6 +103,10 @@
   margin: 0;
 }
 
+.page-header__subtitle a {
+  color: #1565c0;
+}
+
 /* Notices (not logged in / no privileges / no courses) */
 .access-notice {
   max-width: 560px;

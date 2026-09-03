@@ -64,6 +64,35 @@ export const demoCourses: CourseUnitRealisation[] = [
   ),
 ]
 
+// Namespaces the demo user sees as already provisioned, so the Manage modal can
+// be previewed in development without a real cluster (creation/deletion are
+// no-ops for the demo user in routes/okd.ts). These names mirror what
+// courseNsName() in the frontend derives for the demo courses above:
+// `tkt-cs-<slug>-<start year>`, plus `-group-N` per group.
+//
+// Creation is binary, so each demo course is in exactly one mode:
+//  - "Distributed Systems": group mode — three group namespaces, no course one.
+//  - "Databases and Web Programming": course mode — a single course namespace,
+//    end date pulled forward to tomorrow, so its card shows an imminent
+//    "Active until" in red (scheduled for deletion).
+const DEMO_NS_GROUPS = 'tkt-cs-distributed-systems-2026'
+const DEMO_NS_PENDING = 'tkt-cs-tietokannat-ja-web-ohjelmointi-2026'
+
+const tomorrow = (() => {
+  const d = new Date()
+  d.setDate(d.getDate() + 1)
+  return d.toISOString().slice(0, 10)
+})()
+
+export const demoNamespaces = [
+  // Group mode — active (endDate is the normal course-end + 60 days).
+  { name: `${DEMO_NS_GROUPS}-group-1`, created: '2026-10-20T09:05:00.000Z', endDate: '2027-02-16' },
+  { name: `${DEMO_NS_GROUPS}-group-2`, created: '2026-10-20T09:05:00.000Z', endDate: '2027-02-16' },
+  { name: `${DEMO_NS_GROUPS}-group-3`, created: '2026-10-20T09:05:00.000Z', endDate: '2027-02-16' },
+  // Course mode — scheduled for deletion.
+  { name: DEMO_NS_PENDING, created: '2026-11-01T09:00:00.000Z', endDate: tomorrow },
+]
+
 function student(
   uid: string,
   firstNames: string,

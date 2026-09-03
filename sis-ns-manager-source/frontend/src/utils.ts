@@ -1,5 +1,9 @@
 import type { CourseUnitRealisation } from '@common/types'
 
+// OKD CS admins — contact address for access requests and advanced management
+// that this UI doesn't cover.
+export const ADMIN_EMAIL = 'grp-okd-cs-admins@helsinki.fi'
+
 export function getCourseEndDate(course: CourseUnitRealisation): Date {
   return new Date(course.activityPeriod.endDate as string)
 }

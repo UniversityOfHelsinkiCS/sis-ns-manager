@@ -23,6 +23,73 @@
   font-family: ui-monospace, Consolas, monospace;
 }
 
+.ns-table__actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ns-table__row--scheduled td:not(.ns-table__actions) {
+  opacity: 0.5;
+}
+
+.ns-table__row--scheduled .ns-table__name {
+  text-decoration: line-through;
+}
+
+.ns-table__scheduled {
+  font-size: 12px;
+  color: #c62828;
+}
+
+.ns-row-confirm-row td {
+  background: #fff5f5;
+  padding: 12px 10px;
+}
+
+.ns-row-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ns-row-confirm__input {
+  flex: 1;
+  min-width: 200px;
+  padding: 6px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: ui-monospace, Consolas, monospace;
+  color: #212121;
+  background: #fff;
+  outline: none;
+}
+
+.ns-row-confirm__input:focus {
+  border-color: #c62828;
+}
+
+.ns-table__hint {
+  font-size: 12px;
+  color: #757575;
+  margin: 0 0 10px;
+}
+
+.manage-contact {
+  margin: 0;
+  font-size: 12px;
+  color: #757575;
+}
+
+.manage-contact a {
+  color: #1565c0;
+}
+
+.ns-table__hint code {
+  font-size: 11px;
+}
+
 .ns-badge {
   display: inline-block;
   padding: 2px 8px;
@@ -31,11 +98,6 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-}
-
-.ns-badge--course {
-  background: #e3f0fc;
-  color: #1565c0;
 }
 
 .ns-badge--group {
@@ -56,6 +118,12 @@
 .manage-delete__description {
   font-size: 13px;
   color: #424242;
+  margin: 0;
+}
+
+.manage-delete__none {
+  font-size: 13px;
+  color: #757575;
   margin: 0;
 }
 
