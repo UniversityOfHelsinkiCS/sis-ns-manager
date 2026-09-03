@@ -3,7 +3,14 @@ import type { CourseUnitRealisation, Student, GroupAssignment } from '@common/ty
 import { StudentGroupAssignment } from './StudentGroupAssignment'
 import { Modal } from './Modal'
 import { createNamespace, addNamespaceUsers, errorMessage } from '../util/okdApi'
-import { getActiveUntil, formatDate, validateNsName } from '../utils'
+import {
+  getActiveUntil,
+  formatDate,
+  validateNsName,
+  studentUsername,
+  studentName,
+  byStudentUsername,
+} from '../utils'
 
 interface Props {
   course: CourseUnitRealisation
@@ -79,7 +86,10 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
     setError(null)
     try {
       if (!createGroups) {
-        await createNamespace(name.trim(), course.id)
+        const ns = name.trim()
+        await createNamespace(ns, course.id)
+        const studentNumbers = students.map(s => s.studentNumber).filter(Boolean)
+        if (studentNumbers.length > 0) await addNamespaceUsers(ns, studentNumbers)
       } else {
         for (const group of activeGroups) {
           const studentNumbers = students
@@ -99,6 +109,7 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
   }
 
   const displayName = (course.name.fi ?? course.name.en ?? course.id) as string
+  const roster = [...students].sort(byStudentUsername)
 
   return (
     <Modal title="Create namespace" onClose={onClose}>
@@ -129,7 +140,25 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
             />
             {nameError && <span className="modal-field__error">{nameError}</span>}
           </div>
-          <p className="modal-note">You'll be added as admin to this namespace.</p>
+
+          {roster.length > 0 && (
+            <div className="modal-field">
+              <span className="modal-field__label">Course students ({roster.length})</span>
+              <div className="modal-roster">
+                {roster.map(s => (
+                  <div key={s.studentNumber} className="modal-roster__student">
+                    <span className="modal-roster__name">{studentUsername(s)}</span>
+                    <span className="modal-roster__fullname">{studentName(s)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <p className="modal-note">
+            You{roster.length > 0 ? ' and all course students' : ''} will be added
+            as admin to this namespace.
+          </p>
         </>
       )}
 

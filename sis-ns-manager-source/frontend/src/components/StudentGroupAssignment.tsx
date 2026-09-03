@@ -1,4 +1,5 @@
 import type { Student, GroupAssignment } from '@common/types'
+import { studentUsername as username, studentName as fullName, byStudentUsername } from '../utils'
 import './StudentGroupAssignment.css'
 
 interface Props {
@@ -8,14 +9,6 @@ interface Props {
   onChange: (assignment: GroupAssignment) => void
 }
 
-// The uid (part of eduPersonPrincipalName before '@') — the same identifier the
-// backend grants namespace access to. Falls back to the student number.
-const username = (s: Student) =>
-  s.eduPersonPrincipalName?.split('@')[0] || s.studentNumber
-
-const fullName = (s: Student) =>
-  [s.firstNames?.split(' ')[0], s.lastName].filter(Boolean).join(' ')
-
 export function autoAssign(students: Student[], groupCount: number): GroupAssignment {
   const result: GroupAssignment = {}
   students.forEach((s, i) => {
@@ -24,7 +17,8 @@ export function autoAssign(students: Student[], groupCount: number): GroupAssign
   return result
 }
 
-export function StudentGroupAssignment({ students, groupCount, assignment, onChange }: Props) {
+export function StudentGroupAssignment({ students: unsorted, groupCount, assignment, onChange }: Props) {
+  const students = [...unsorted].sort(byStudentUsername)
   const groups = Array.from({ length: groupCount }, (_, i) => i + 1)
 
   function setGroup(studentId: string, group: number) {

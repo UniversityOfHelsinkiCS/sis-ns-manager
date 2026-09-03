@@ -260,6 +260,47 @@
   color: #c62828;
 }
 
+/* Flat course roster (single-namespace mode) */
+.modal-roster {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.modal-roster__student {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  padding: 3px 7px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.modal-roster__name {
+  font-family: ui-monospace, Consolas, monospace;
+  color: #212121;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.modal-roster__fullname {
+  color: #9e9e9e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1 1 auto;
+  text-align: right;
+}
+
 /* Per-group namespace name inputs */
 .modal-groups__names {
   display: flex;

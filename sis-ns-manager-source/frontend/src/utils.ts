@@ -1,4 +1,4 @@
-import type { CourseUnitRealisation } from '@common/types'
+import type { CourseUnitRealisation, Student } from '@common/types'
 
 // OKD CS admins — contact address for access requests and advanced management
 // that this UI doesn't cover.
@@ -37,6 +37,18 @@ export function validateNsName(name: string): string | null {
   if (!NS_NAME_RE.test(n)) return 'Use lowercase letters, digits and hyphens only'
   return null
 }
+
+// The uid (part of eduPersonPrincipalName before '@') — the same identifier the
+// backend grants namespace access to. Falls back to the student number.
+export const studentUsername = (s: Student): string =>
+  s.eduPersonPrincipalName?.split('@')[0] || s.studentNumber
+
+export const studentName = (s: Student): string =>
+  [s.firstNames?.split(' ')[0], s.lastName].filter(Boolean).join(' ')
+
+// Alphabetical by username — for a predictable roster order.
+export const byStudentUsername = (a: Student, b: Student): number =>
+  studentUsername(a).localeCompare(studentUsername(b))
 
 export function formatDate(iso: string | Date): string {
   const d = new Date(iso)
