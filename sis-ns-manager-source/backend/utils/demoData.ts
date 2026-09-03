@@ -66,9 +66,8 @@ export const demoCourses: CourseUnitRealisation[] = [
 
 // Namespaces the demo user sees as already provisioned, so the Manage modal can
 // be previewed in development without a real cluster (creation/deletion are
-// no-ops for the demo user in routes/okd.ts). These names mirror what
-// courseNsName() in the frontend derives for the demo courses above:
-// `tkt-cs-<slug>-<start year>`, plus `-group-N` per group.
+// no-ops for the demo user in routes/okd.ts). Associated with a course by the
+// `course` field (mirrors the COURSE_ANNOTATION on real namespaces).
 //
 // Creation is binary, so each demo course is in exactly one mode:
 //  - "Distributed Systems": group mode — three group namespaces, no course one.
@@ -76,7 +75,9 @@ export const demoCourses: CourseUnitRealisation[] = [
 //    end date pulled forward to tomorrow, so its card shows an imminent
 //    "Active until" in red (scheduled for deletion).
 const DEMO_NS_GROUPS = 'tkt-cs-distributed-systems-2026'
+const DEMO_GROUPS_COURSE = 'hy-opt-cur-2526-b8ec1422-835b-4bdb-bd2c-25df506de0f8'
 const DEMO_NS_PENDING = 'tkt-cs-tietokannat-ja-web-ohjelmointi-2026'
+const DEMO_PENDING_COURSE = 'hy-opt-cur-2526-e435f40e-4faa-4140-96b6-e77a2e161b06'
 
 const tomorrow = (() => {
   const d = new Date()
@@ -86,11 +87,11 @@ const tomorrow = (() => {
 
 export const demoNamespaces = [
   // Group mode — active (endDate is the normal course-end + 60 days).
-  { name: `${DEMO_NS_GROUPS}-group-1`, created: '2026-10-20T09:05:00.000Z', endDate: '2027-02-16' },
-  { name: `${DEMO_NS_GROUPS}-group-2`, created: '2026-10-20T09:05:00.000Z', endDate: '2027-02-16' },
-  { name: `${DEMO_NS_GROUPS}-group-3`, created: '2026-10-20T09:05:00.000Z', endDate: '2027-02-16' },
+  { name: `${DEMO_NS_GROUPS}-group-1`, created: '2026-10-20T09:05:00.000Z', endDate: '2027-02-16', course: DEMO_GROUPS_COURSE },
+  { name: `${DEMO_NS_GROUPS}-group-2`, created: '2026-10-20T09:05:00.000Z', endDate: '2027-02-16', course: DEMO_GROUPS_COURSE },
+  { name: `${DEMO_NS_GROUPS}-group-3`, created: '2026-10-20T09:05:00.000Z', endDate: '2027-02-16', course: DEMO_GROUPS_COURSE },
   // Course mode — scheduled for deletion.
-  { name: DEMO_NS_PENDING, created: '2026-11-01T09:00:00.000Z', endDate: tomorrow },
+  { name: DEMO_NS_PENDING, created: '2026-11-01T09:00:00.000Z', endDate: tomorrow, course: DEMO_PENDING_COURSE },
 ]
 
 function student(

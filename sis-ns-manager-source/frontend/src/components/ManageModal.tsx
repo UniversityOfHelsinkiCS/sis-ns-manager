@@ -7,13 +7,12 @@ import './ManageModal.css'
 
 interface Props {
   course: CourseUnitRealisation
-  nsName: string
   namespaces: NamespaceInfo[]
   onClose: () => void
   onDeleted: () => void
 }
 
-export function ManageModal({ course, nsName, namespaces, onClose, onDeleted }: Props) {
+export function ManageModal({ course, namespaces, onClose, onDeleted }: Props) {
   const [confirmation, setConfirmation] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -35,7 +34,12 @@ export function ManageModal({ course, nsName, namespaces, onClose, onDeleted }: 
 
   // Creation is binary: a course has either one course namespace or a set of
   // group namespaces, never both. The modal follows whichever mode it's in.
-  const groupMode = namespaces.length > 0 && namespaces.every(ns => ns.type === 'group')
+  const groupMode = namespaces.length > 1
+
+  // Text the user must type to confirm the bulk delete. Namespace names are
+  // user-defined, so in group mode there's no shared base — fall back to the
+  // course id (also shown in the modal title).
+  const confirmToken = groupMode ? course.id : (namespaces[0]?.name ?? '')
 
   // Namespaces not yet scheduled for deletion — the only ones the bulk delete
   // can act on. When none are left there is nothing to confirm.
@@ -90,7 +94,7 @@ export function ManageModal({ course, nsName, namespaces, onClose, onDeleted }: 
     }
   }
 
-  const confirmed = confirmation === nsName
+  const confirmed = confirmation === confirmToken
 
   return (
     <Modal title={`Manage — ${course.id}`} onClose={onClose}>
@@ -190,8 +194,8 @@ export function ManageModal({ course, nsName, namespaces, onClose, onDeleted }: 
                 Deleting schedules {partial ? 'the remaining ' : 'all '}
                 {pending.length} group namespace{pending.length !== 1 ? 's' : ''} for
                 removal. They remain available for a 1-day grace period and are
-                permanently deleted tomorrow ({deletionDate}). Type the course
-                name below to confirm.
+                permanently deleted tomorrow ({deletionDate}). Type the course id
+                below to confirm.
               </>
             ) : (
               <>
@@ -201,11 +205,11 @@ export function ManageModal({ course, nsName, namespaces, onClose, onDeleted }: 
               </>
             )}
           </p>
-          <code className="modal-field__value">{nsName}</code>
+          <code className="modal-field__value">{confirmToken}</code>
           <input
             className="manage-delete__input"
             type="text"
-            placeholder={nsName}
+            placeholder={confirmToken}
             value={confirmation}
             onChange={e => setConfirmation(e.target.value)}
             disabled={loading}

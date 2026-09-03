@@ -4,6 +4,7 @@ export type NamespaceSummary = {
   name: string
   created: string
   endDate: string | null
+  course: string | null
 }
 
 export const createNamespace = (name: string, courseId: string) =>

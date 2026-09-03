@@ -4,12 +4,13 @@ import { getCourse, getStudentsByNumbers } from '../utils/sisService.ts'
 import {
   PROVISIONER_ANNOTATION,
   END_DATE_ANNOTATION,
+  COURSE_ANNOTATION,
   listNamespacesByAnnotation,
   createProject,
   patchNamespaceAnnotations,
   grantNamespaceAdmin,
 } from '../utils/okdClient.ts'
-import { isDemoUser } from '../utils/validations.ts'
+import { isDemoUser, isValidNamespaceName } from '../utils/validations.ts'
 import { demoNamespaces } from '../utils/demoData.ts'
 import requireAllowed from '../middleware/requireAllowed.ts'
 import requireNamespaceOwner from '../middleware/requireNamespaceOwner.ts'
@@ -36,6 +37,7 @@ okdRouter.get('/namespaces', async (req, res) => {
       name: ns.metadata?.name,
       created: ns.metadata?.creationTimestamp,
       endDate: ns.metadata?.annotations?.[END_DATE_ANNOTATION] ?? null,
+      course: ns.metadata?.annotations?.[COURSE_ANNOTATION] ?? null,
     })),
   )
 })
@@ -46,6 +48,13 @@ okdRouter.get('/namespaces', async (req, res) => {
 okdRouter.post('/namespaces/:id', requireAllowed, async (req, res) => {
   const user = req.user as User
   const name = req.params.id
+  if (!isValidNamespaceName(name)) {
+    res.status(400).json({
+      message: 'Invalid namespace name: use 1–63 lowercase letters, digits and hyphens',
+    })
+    return
+  }
+
   const { courseId } = req.body as { courseId?: string }
   if (!courseId) {
     res.status(400).json({ message: 'courseId is required' })
@@ -72,6 +81,7 @@ okdRouter.post('/namespaces/:id', requireAllowed, async (req, res) => {
   await patchNamespaceAnnotations(name, {
     [PROVISIONER_ANNOTATION]: user.username,
     [END_DATE_ANNOTATION]: endDate,
+    [COURSE_ANNOTATION]: courseId,
   })
   // Grant the provisioner admin in the namespace they just created. This covers
   // both a single course namespace and each group namespace (one POST per

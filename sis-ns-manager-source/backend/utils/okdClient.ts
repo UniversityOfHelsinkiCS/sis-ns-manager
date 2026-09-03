@@ -11,6 +11,10 @@ import {
 // Annotations stamped on namespaces we provision.
 export const PROVISIONER_ANNOTATION = 'sis-ns-manager/provisioner'
 export const END_DATE_ANNOTATION = 'sis-ns-manager/endDate'
+// SIS course id the namespace belongs to. Lets the UI associate namespaces with
+// a course by annotation rather than by a derived name, so the name is free to
+// be customised at creation time.
+export const COURSE_ANNOTATION = 'sis-ns-manager/course'
 
 const errStatus = (err: unknown): number | undefined =>
   (err as { code?: number }).code ?? (err as { statusCode?: number }).statusCode

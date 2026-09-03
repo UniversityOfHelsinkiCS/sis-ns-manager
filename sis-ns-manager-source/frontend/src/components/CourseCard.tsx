@@ -21,19 +21,22 @@ export function CourseCard({ course }: Props) {
   )
   const all = Array.isArray(data) ? data : []
 
-  const existingNamespaces: NamespaceInfo[] = all
-    .filter((ns) => ns.name === nsName || ns.name.startsWith(`${nsName}-group-`))
-    .map((ns) => {
-      const groupMatch = ns.name === nsName ? null : ns.name.match(/-group-(\d+)$/)
-      return {
-        name: ns.name,
-        type: groupMatch ? 'group' : 'course',
-        groupNumber: groupMatch ? Number(groupMatch[1]) : undefined,
-        created: ns.created,
-        activeUntil: ns.endDate ?? undefined,
-        studentCount: 0,
-      }
-    })
+  // Namespaces belonging to this course, identified by the course annotation.
+  const courseNamespaces = all
+    .filter((ns) => ns.course === course.id)
+    .sort((a, b) => a.created.localeCompare(b.created))
+
+  // Creation is binary: more than one namespace means group mode. Namespace
+  // names are user-defined, so the "Group N" number is just the creation order.
+  const groupMode = courseNamespaces.length > 1
+  const existingNamespaces: NamespaceInfo[] = courseNamespaces.map((ns, i) => ({
+    name: ns.name,
+    type: groupMode ? 'group' : 'course',
+    groupNumber: groupMode ? i + 1 : undefined,
+    created: ns.created,
+    activeUntil: ns.endDate ?? undefined,
+    studentCount: 0,
+  }))
 
   const isActive = existingNamespaces.length > 0
   // The default active-until date shown to the user: 30 days past the course
@@ -121,7 +124,6 @@ export function CourseCard({ course }: Props) {
       {manageOpen && (
         <ManageModal
           course={course}
-          nsName={nsName}
           namespaces={existingNamespaces}
           onClose={() => setManageOpen(false)}
           onDeleted={() => { refetch() }}
