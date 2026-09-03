@@ -129,6 +129,16 @@ okdRouter.post('/namespaces/:id/users', [requireAllowed, requireNamespaceOwner],
     .map((student) => student.eduPersonPrincipalName?.split('@')[0])
     .filter((uid): uid is string => Boolean(uid))
 
+  // Guard against silently granting no one: if the caller asked for students but
+  // none resolved to a username, the SIS lookup failed rather than succeeded
+  // with an empty set. Surface it instead of returning a misleading 201.
+  if (usernames.length === 0) {
+    res.status(502).json({
+      message: 'Could not resolve any of the given students from SIS',
+    })
+    return
+  }
+
   if (!isDemoUser(user)) {
     await grantNamespaceAdmin(name, usernames)
   }

@@ -53,7 +53,8 @@ export const getStudents = async (
   return data.map((e: { student: Student }) => toStudent(e.student))
 }
 
-// Looks up full person records by student number (POST /students). The returned
+// Looks up full person records by student number (POST /students). The endpoint
+// expects the request body to be a raw array of student numbers. The returned
 // records carry eduPersonPrincipalName, from which the uid is derived.
 export const getStudentsByNumbers = async (
   user: User,
@@ -61,6 +62,6 @@ export const getStudentsByNumbers = async (
 ): Promise<Student[]> => {
   if (isDemoUser(user)) return getDemoStudentsByNumbers(studentNumbers)
 
-  const { data } = await api.post('/students', { studentNumbers })
+  const { data } = await api.post('/students', studentNumbers)
   return (data as Student[]).map(toStudent)
 }
