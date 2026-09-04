@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Read(//claude/sis-ns-manager/base/**)",
-      "Read(//claude/sis-ns-manager/overlays/**)"
-    ]
-  }
-}
