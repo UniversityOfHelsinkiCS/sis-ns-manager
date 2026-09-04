@@ -24,5 +24,6 @@ dist-ssr
 *.sln
 *.sw?
 
-.claude
-**/*/.claude
+.claude/
+**/*/.claude/
+**/CLAUDE.md
