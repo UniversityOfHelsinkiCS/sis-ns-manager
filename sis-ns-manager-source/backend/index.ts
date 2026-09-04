@@ -1,6 +1,8 @@
 import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { readFileSync } from 'fs'
+import { marked } from 'marked'
 import session from 'express-session'
 import { RedisStore } from 'connect-redis'
 import passport from 'passport'
@@ -12,6 +14,13 @@ import { getClient, oidcParams, verifyLogin } from './utils/oidc.ts'
 import { inDevelopment, inProduction, SESSION_SECRET } from './utils/config.ts'
 
 const PORT = process.env.PORT ?? 3001
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+// Rendered once at startup: the privacy policy is a static file, no reason to
+// re-read and re-parse it on every request.
+const privacyPolicyHtml = marked.parse(
+  readFileSync(path.join(__dirname, 'assets', 'tietosuojaseloste.md'), 'utf-8'),
+)
 
 const app = express()
 
@@ -60,13 +69,28 @@ if (inDevelopment) {
   })
 }
 
+// Public: no auth required, so it's reachable from the login screen too.
+app.get('/tietosuojaseloste', (_req, res) => {
+  res.type('html').send(`<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<title>Tietosuojaseloste</title>
+<style>
+  body { max-width: 720px; margin: 40px auto; padding: 0 20px; font: 15px/1.6 system-ui, sans-serif; color: #212121; }
+  h1, h2, h3 { color: #1565c0; }
+</style>
+</head>
+<body>${privacyPolicyHtml}</body>
+</html>`)
+})
+
 app.use('/api', router)
 app.use('/api', (_, res) => {
   res.sendStatus(404)
 })
 
 if (inProduction) {
-  const __dirname = path.dirname(fileURLToPath(import.meta.url))
   const distPath = path.join(__dirname, '..', 'frontend', 'dist')
   app.use(express.static(distPath))
   app.get('/{*path}', (_, res) => {

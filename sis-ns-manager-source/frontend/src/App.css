@@ -147,6 +147,21 @@
   gap: 10px;
 }
 
+/* Footer */
+.app-footer {
+  padding: 16px 24px 24px;
+  text-align: center;
+}
+
+.app-footer__link {
+  font-size: 13px;
+  color: #757575;
+}
+
+.app-footer__link:hover {
+  color: #1565c0;
+}
+
 @media (max-width: 600px) {
   .app-main {
     padding: 24px 16px 48px;

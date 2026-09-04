@@ -127,6 +127,12 @@ export default function App() {
           ) : null}
         </div>
       </main>
+
+      <footer className="app-footer">
+        <a className="app-footer__link" href="/tietosuojaseloste" target="_blank" rel="noreferrer">
+          Tietosuojaseloste
+        </a>
+      </footer>
     </div>
   )
 }
