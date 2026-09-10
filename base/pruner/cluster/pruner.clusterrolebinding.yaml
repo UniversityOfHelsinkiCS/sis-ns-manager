@@ -1,0 +1,14 @@
+# Subject namespace is PLACEHOLDER in base/ and replaced by
+# overlays/prod/cluster/kustomization.yaml (the pruner runs in prod only).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pruner-clusterrolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: pruner-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: pruner
+  namespace: PLACEHOLDER

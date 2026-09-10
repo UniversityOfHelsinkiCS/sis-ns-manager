@@ -2,7 +2,6 @@ apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
   name: sis-ns-manager
-  namespace: sis-ns-manager
 spec:
   lookupPolicy:
     local: false
@@ -11,7 +10,6 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   name: sis-ns-manager-build
-  namespace: sis-ns-manager
 spec:
   failedBuildsHistoryLimit: 5
   nodeSelector: null

@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Staging instance. Synced by its own ArgoCD Application
+# (destination namespace sis-ns-manager-staging, CreateNamespace=true).
+namespace: sis-ns-manager-staging
+
+resources:
+  - ../../base
+  - cluster                    # cluster-scoped RBAC, prefixed staging-
+
+# Staging builds track the test-clusters branch until a dedicated staging
+# branch exists (this matches the base default, kept explicit).
+patches:
+  - target:
+      kind: BuildConfig
+    patch: |-
+      - op: replace
+        path: /spec/source/git/ref
+        value: test-clusters

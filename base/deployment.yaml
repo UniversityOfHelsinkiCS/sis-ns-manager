@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: sis-ns-manager
   annotations:
-    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"sis-ns-manager:latest","namespace":"sis-ns-manager"},"fieldPath":"spec.template.spec.containers[?(@.name==\"sis-ns-manager\")].image"}]'
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"sis-ns-manager:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"sis-ns-manager\")].image"}]'
 spec:
   replicas: 1
   selector:
@@ -17,7 +17,10 @@ spec:
       serviceAccountName: manager
       containers:
         - name: sis-ns-manager
-          image: image-registry.openshift-image-registry.svc:5000/sis-ns-manager/sis-ns-manager
+          # Seed value only: the image.openshift.io/triggers controller rewrites
+          # this to the digest pullspec from the in-namespace ImageStream on each
+          # build. Kept as a bare tag so no namespace is baked into base/.
+          image: sis-ns-manager:latest
           ports:
             - containerPort: 3001
           env:

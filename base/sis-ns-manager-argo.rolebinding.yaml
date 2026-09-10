@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sis-ns-manager-argo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: sis-ns-manager-argo
+subjects:
+  - kind: ServiceAccount
+    name: openshift-gitops-argocd-application-controller
+    namespace: openshift-gitops

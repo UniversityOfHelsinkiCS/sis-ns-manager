@@ -1,5 +1,8 @@
+# Lets the OpenShift GitOps (ArgoCD) application-controller manage this app's
+# namespaced resources in whichever namespace the overlay targets. Every
+# resource type here is namespaced, so this is a Role, not a ClusterRole.
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: sis-ns-manager-argo
 rules:
@@ -46,25 +49,3 @@ rules:
       - delete
       - update
       - patch
---- 
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: manager-clusterrole
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-  - list
-  - patch
-- apiGroups:
-  - "user.openshift.io"
-  resources:
-  - groups
-  verbs:
-  - get
-  - create
-  - patch
