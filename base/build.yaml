@@ -35,9 +35,3 @@ spec:
         name: dockerhub-regcred
     type: Docker
   successfulBuildsHistoryLimit: 5
-  triggers:
-  - github:
-      secretReference:
-        name: sis-ns-manager-github-webhook-secret
-    type: "GitHub"
-  - type: ConfigChange
