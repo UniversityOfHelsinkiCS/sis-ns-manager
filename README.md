@@ -2,10 +2,10 @@
 
 Kubernetes namespace manager for the University of Helsinki SIS infrastructure.
 
-## Frontend
+## DEV
 
 ```bash
-cd sis-ns-manager-frontend
+cd sis-ns-manager-source
 npm install
 npm run dev
 ```
