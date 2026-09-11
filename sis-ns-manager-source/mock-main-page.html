@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sis-namespace-manager — mock</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      color: #212121;
+    }
+
+    /* ── App layout ── */
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #fafafa;
+    }
+
+    /* ── Header ── */
+    .app-header {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .app-header__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .app-header__brand {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .app-header__university {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1565c0;
+      letter-spacing: .01em;
+    }
+    .app-header__divider { color: #bdbdbd; font-size: 14px; }
+    .app-header__title {
+      font-size: 14px;
+      font-weight: 400;
+      color: #616161;
+      font-family: ui-monospace, Consolas, monospace;
+    }
+    .app-header__user { font-size: 13px; color: #757575; }
+
+    /* ── Main ── */
+    .app-main { flex: 1; padding: 40px 24px 64px; }
+    .app-main__inner { max-width: 1100px; margin: 0 auto; }
+
+    .page-header { margin-bottom: 32px; }
+    .page-header__title {
+      font-size: 28px;
+      font-weight: 500;
+      color: #212121;
+      margin: 0 0 6px;
+      letter-spacing: -.02em;
+    }
+    .page-header__subtitle { font-size: 14px; color: #757575; margin: 0; }
+
+    /* ── Course grid ── */
+    .course-grid { display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── Course card ── */
+    .course-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05);
+      transition: box-shadow .15s ease;
+    }
+    .course-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.09); }
+
+    .course-card__meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-shrink: 0;
+      width: 130px;
+    }
+    .course-card__name {
+      font-size: 15px;
+      font-weight: 500;
+      color: #212121;
+      margin: 0;
+      line-height: 1.3;
+    }
+    .course-card__period { font-size: 11px; color: #9e9e9e; }
+
+    .course-card__body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .course-card__code {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #1565c0;
+      background: #e3f0fc;
+      padding: 2px 7px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      align-self: flex-start;
+      text-decoration: none;
+    }
+    .course-card__active-until { font-size: 11px; color: #9e9e9e; }
+    .course-card__active-until--expired { color: #c62828; }
+
+    .course-card__actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    /* ── Buttons ── */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      letter-spacing: .02em;
+    }
+    .btn--primary { background: #1976d2; color: #fff; }
+    .btn--manage { background: #f5f5f5; color: #424242; border: 1px solid #e0e0e0; }
+
+    /* ── External link icon ── */
+    .ext-icon { display: inline-block; vertical-align: middle; margin-left: 3px; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-header__inner">
+      <div class="app-header__brand">
+        <span class="app-header__university">University of Helsinki</span>
+        <span class="app-header__divider" aria-hidden="true">·</span>
+        <span class="app-header__title">sis-namespace-manager</span>
+      </div>
+      <span class="app-header__user">Logged in as: lzhelmer</span>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="app-main">
+    <div class="app-main__inner">
+
+      <div class="page-header">
+        <h1 class="page-header__title">Courses</h1>
+        <p class="page-header__subtitle">
+          Provision Kubernetes namespaces in the OKD cluster for your courses.
+        </p>
+      </div>
+
+      <div class="course-grid">
+
+        <!-- Active course (has namespace) -->
+        <div class="course-card">
+          <div class="course-card__meta">
+            <h2 class="course-card__name">Introduction to Programming</h2>
+            <span class="course-card__period">2025</span>
+          </div>
+          <div class="course-card__body">
+            <a href="#" class="course-card__code">
+              Course page
+              <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <span class="course-card__active-until">Active until 15-06-2025</span>
+          </div>
+          <div class="course-card__actions">
+            <button class="btn btn--manage">Manage</button>
+          </div>
+        </div>
+
+        <!-- Active course (has namespace, near expiry) -->
+        <div class="course-card">
+          <div class="course-card__meta">
+            <h2 class="course-card__name">Data Structures and Algorithms</h2>
+            <span class="course-card__period">2025</span>
+          </div>
+          <div class="course-card__body">
+            <a href="#" class="course-card__code">
+              Course page
+              <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <span class="course-card__active-until course-card__active-until--expired">Active until 12-05-2025</span>
+          </div>
+          <div class="course-card__actions">
+            <button class="btn btn--manage">Manage</button>
+          </div>
+        </div>
+
+        <!-- No namespace yet -->
+        <div class="course-card">
+          <div class="course-card__meta">
+            <h2 class="course-card__name">Advanced Web Development</h2>
+            <span class="course-card__period">2025</span>
+          </div>
+          <div class="course-card__body">
+            <a href="#" class="course-card__code">
+              Course page
+              <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+          <div class="course-card__actions">
+            <button class="btn btn--primary">Create namespace</button>
+          </div>
+        </div>
+
+        <!-- No namespace yet -->
+        <div class="course-card">
+          <div class="course-card__meta">
+            <h2 class="course-card__name">Operating Systems</h2>
+            <span class="course-card__period">2025</span>
+          </div>
+          <div class="course-card__body">
+            <a href="#" class="course-card__code">
+              Course page
+              <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+          <div class="course-card__actions">
+            <button class="btn btn--primary">Create namespace</button>
+          </div>
+        </div>
+
+        <!-- Active -->
+        <div class="course-card">
+          <div class="course-card__meta">
+            <h2 class="course-card__name">Databases and SQL</h2>
+            <span class="course-card__period">2025</span>
+          </div>
+          <div class="course-card__body">
+            <a href="#" class="course-card__code">
+              Course page
+              <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <span class="course-card__active-until">Active until 30-07-2025</span>
+          </div>
+          <div class="course-card__actions">
+            <button class="btn btn--manage">Manage</button>
+          </div>
+        </div>
+
+        <!-- No namespace yet -->
+        <div class="course-card">
+          <div class="course-card__meta">
+            <h2 class="course-card__name">Machine Learning Fundamentals</h2>
+            <span class="course-card__period">2025</span>
+          </div>
+          <div class="course-card__body">
+            <a href="#" class="course-card__code">
+              Course page
+              <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+          <div class="course-card__actions">
+            <button class="btn btn--primary">Create namespace</button>
+          </div>
+        </div>
+
+        <!-- No namespace yet -->
+        <div class="course-card">
+          <div class="course-card__meta">
+            <h2 class="course-card__name">Software Engineering Project</h2>
+            <span class="course-card__period">2025</span>
+          </div>
+          <div class="course-card__body">
+            <a href="#" class="course-card__code">
+              Course page
+              <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+          <div class="course-card__actions">
+            <button class="btn btn--primary">Create namespace</button>
+          </div>
+        </div>
+
+      </div><!-- /course-grid -->
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+import { useState } from 'react'
+import type { CourseUnitRealisation, NamespaceInfo, Student } from '@common/types'
+import { getActiveUntil, getCourseEndDate, formatDate, courseNsName } from '../utils'
+import { CreateNamespaceModal } from './CreateNamespaceModal'
+import { ManageModal } from './ManageModal'
+import useApi from '../util/useApi'
+import type { NamespaceSummary } from '../util/okdApi'
+import './CourseCard.css'
+
+interface Props {
+  course: CourseUnitRealisation
+}
+
+export function CourseCard({ course }: Props) {
+  const nsName = courseNsName(course)
+
+  const { data, refetch } = useApi<NamespaceSummary[]>(
+    'namespaces',
+    '/api/okd/namespaces',
+    'GET',
+  )
+  const all = Array.isArray(data) ? data : []
+
+  // Namespaces belonging to this course, identified by the course annotation.
+  const courseNamespaces = all
+    .filter((ns) => ns.course === course.id)
+    .sort((a, b) => a.created.localeCompare(b.created))
+
+  // Creation is binary: more than one namespace means group mode. Namespace
+  // names are user-defined, so the "Group N" number is just the creation order.
+  const groupMode = courseNamespaces.length > 1
+  const existingNamespaces: NamespaceInfo[] = courseNamespaces.map((ns, i) => ({
+    name: ns.name,
+    type: groupMode ? 'group' : 'course',
+    groupNumber: groupMode ? i + 1 : undefined,
+    created: ns.created,
+    activeUntil: ns.endDate ?? undefined,
+    studentCount: 0,
+  }))
+
+  const isActive = existingNamespaces.length > 0
+  // The default active-until date shown to the user: 30 days past the course
+  // end — the real annotation (used by the pruner) is set 60 days past course
+  // end, giving a 30-day grace window where the namespace still exists but is
+  // hidden from the UI below. A scheduled delete overrides this (see below).
+  const activeUntilDate = getActiveUntil(course)
+  const pastCourseEnd = new Date() > getCourseEndDate(course)
+  const hidden = isActive && new Date() > activeUntilDate
+
+  // If a namespace's end-date annotation has been pulled forward before the
+  // normal grace window, a delete is scheduled — surface that (sooner) date
+  // instead, so "Active until" reflects the imminent removal.
+  const scheduledDeletion = existingNamespaces
+    .map((ns) => ns.activeUntil)
+    .filter((d): d is string => Boolean(d) && new Date(d) < activeUntilDate)
+    .sort()[0]
+  const activeUntil = formatDate(scheduledDeletion ?? activeUntilDate)
+
+  const [open, setCreateOpen] = useState(false)
+  const [manageOpen, setManageOpen] = useState(false)
+  const [students, setStudents] = useState<Student[]>([])
+
+  async function handleCreateOpen() {
+    const response = await fetch(`/api/sis/courses/${course.id}/students`)
+    const data = await response.json()
+    setStudents(data)
+    setCreateOpen(true)
+  }
+
+  if (hidden) return null
+
+  const displayName = (course.name.fi ?? course.name.en ?? course.id) as string
+  const startYear = new Date(course.activityPeriod.startDate as string).getFullYear()
+
+  return (
+    <>
+      <div className="course-card">
+        <div className="course-card__meta">
+          <h2 className="course-card__name">{displayName}</h2>
+          <span className="course-card__period">{startYear}</span>
+        </div>
+        <div className="course-card__body">
+          <a
+            href={`https://studies.helsinki.fi/courses/course-implementation/${course.id}`}
+            target="_blank"
+            rel="noreferrer"
+            className="course-card__code"
+          >
+            Course page
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+          {isActive && (
+            <span className={`course-card__active-until${(pastCourseEnd || scheduledDeletion) ? ' course-card__active-until--expired' : ''}`}>
+              Active until {activeUntil}
+            </span>
+          )}
+        </div>
+        <div className="course-card__actions">
+          {isActive ? (
+            <button className="btn btn--manage" onClick={() => setManageOpen(true)}>
+              Manage
+            </button>
+          ) : (
+            <button className="btn btn--primary" onClick={handleCreateOpen}>
+              Create namespace
+            </button>
+          )}
+        </div>
+      </div>
+
+      {open && (
+        <CreateNamespaceModal
+          course={course}
+          nsName={nsName}
+          students={students}
+          onClose={() => setCreateOpen(false)}
+          onCreated={() => { refetch(); setCreateOpen(false) }}
+        />
+      )}
+      {manageOpen && (
+        <ManageModal
+          course={course}
+          namespaces={existingNamespaces}
+          onClose={() => setManageOpen(false)}
+          onDeleted={() => { refetch() }}
+        />
+      )}
+    </>
+  )
+}

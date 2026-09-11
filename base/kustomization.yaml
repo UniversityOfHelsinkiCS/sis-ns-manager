@@ -1,10 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# Namespaced app resources, environment-agnostic. Not applied directly -
+# consumed by overlays/prod and overlays/staging, which set the namespace.
+# Cluster-scoped RBAC lives in base/cluster/; the pruner lives in base/pruner/.
 resources:
+  - manager-serviceaccount.yaml
+  - sis-ns-manager-argo.role.yaml
+  - sis-ns-manager-argo.rolebinding.yaml
+  - deployment.yaml
+  - redis.yaml
+  - route.yaml
+  - service.yaml
   - build.yaml
-  - serviceaccount.yaml
-  - namespace.yaml
-  # argocd:n vaatimat palikat
-  - ldap-sync.clusterrole.yaml
-  - ldap-sync.clusterrolebinding.yaml

@@ -1,7 +1,7 @@
 apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
-  name: sis-ns-manager
+  name: sis-ns-manager-pruner
 spec:
   lookupPolicy:
     local: false
@@ -9,19 +9,19 @@ spec:
 apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
-  name: sis-ns-manager-build
+  name: sis-ns-manager-pruner-build
 spec:
   failedBuildsHistoryLimit: 5
   nodeSelector: null
   output:
     to:
       kind: ImageStreamTag
-      name: sis-ns-manager:latest
+      name: sis-ns-manager-pruner:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
   source:
-    contextDir: /sis-ns-manager-source
+    contextDir: /sis-ns-manager-pruner
     git:
       uri: git@github.com:UniversityOfHelsinkiCS/sis-ns-manager.git
       ref: test-clusters
