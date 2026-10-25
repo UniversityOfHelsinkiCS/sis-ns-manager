@@ -4,7 +4,7 @@ import { studentUsername, validateNsName } from '../utils'
 
 // Pasted group list, e.g.
 //
-//   - name: tkt-cs-ohtu-2026-team-a
+//   - name: ohtu-2026-team-a
 //     users: [alice, bob]
 //
 // Parsed with the failsafe schema so every scalar stays a string — otherwise

@@ -8,6 +8,7 @@ import { createNamespace, addNamespaceUsers, errorMessage } from '../util/okdApi
 import {
   getActiveUntil,
   formatDate,
+  courseNsName,
   validateNsName,
   validateUsername,
   USERNAME_MAX,
@@ -38,12 +39,12 @@ const INITIAL_GROUPS = 4
 // already edited (including ones above the current count, so lowering then
 // raising the count doesn't lose them).
 const buildGroupNames = (
-  base: string,
+  course: CourseUnitRealisation,
   count: number,
   prev: Record<number, string> = {},
 ): Record<number, string> => {
   const next: Record<number, string> = { ...prev }
-  for (let g = 1; g <= count; g++) next[g] = prev[g] ?? `${base}-${g}`
+  for (let g = 1; g <= count; g++) next[g] = prev[g] ?? courseNsName(course, `-${g}`)
   return next
 }
 
@@ -59,7 +60,7 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
   // course name; fully editable.
   const [name, setName] = useState(nsName)
   const [groupNames, setGroupNames] = useState<Record<number, string>>(() =>
-    buildGroupNames(nsName, INITIAL_GROUPS),
+    buildGroupNames(course, INITIAL_GROUPS),
   )
 
   // Users added by username rather than picked from the course roster.
@@ -78,7 +79,7 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
       for (const [id, g] of Object.entries(prev)) next[id] = g > n ? 0 : g
       return next
     })
-    setGroupNames(prev => buildGroupNames(nsName, n, prev))
+    setGroupNames(prev => buildGroupNames(course, n, prev))
   }
 
   // Replace the whole group setup with a pasted list. Students the list doesn't

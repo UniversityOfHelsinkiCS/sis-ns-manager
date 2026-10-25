@@ -8,9 +8,9 @@ interface Props {
   disabled?: boolean
 }
 
-const PLACEHOLDER = `- name: tkt-cs-course-2026-1
+const PLACEHOLDER = `- name: course-2026-1
   users: [alice, bob]
-- name: tkt-cs-course-2026-2
+- name: course-2026-2
   users:
     - carol
     - dave`
