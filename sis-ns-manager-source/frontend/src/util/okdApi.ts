@@ -7,8 +7,8 @@ export type NamespaceSummary = {
   course: string | null
 }
 
-export const createNamespace = (name: string, courseId: string) =>
-  axios.post(`/api/okd/namespaces/${encodeURIComponent(name)}`, { courseId })
+export const createNamespace = (name: string, courseId: string, usernames: string[] = []) =>
+  axios.post(`/api/okd/namespaces/${encodeURIComponent(name)}`, { courseId, usernames })
 
 export const addNamespaceUsers = (name: string, studentNumbers: string[]) =>
   axios.post(`/api/okd/namespaces/${encodeURIComponent(name)}/users`, {

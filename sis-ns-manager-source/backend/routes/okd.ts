@@ -10,7 +10,7 @@ import {
   patchNamespaceAnnotations,
   grantNamespaceAdmin,
 } from '../utils/okdClient.ts'
-import { isDemoUser, isValidNamespaceName } from '../utils/validations.ts'
+import { isDemoUser, isValidNamespaceName, isValidUsername } from '../utils/validations.ts'
 import { demoNamespaces } from '../utils/demoData.ts'
 import requireAllowed from '../middleware/requireAllowed.ts'
 import requireNamespaceOwner from '../middleware/requireNamespaceOwner.ts'
@@ -44,7 +44,11 @@ okdRouter.get('/namespaces', async (req, res) => {
 
 // POST /api/okd/namespaces/:id — self-provision the namespace :id for a course.
 // The course (looked up by body.courseId) supplies the end date, which is
-// stamped as an annotation for the pruner to act on.
+// stamped as an annotation for the pruner to act on. body.usernames are extra
+// uids the teacher typed in directly (e.g. a TA who isn't on the course
+// roster) - granted admin in the same call as the teacher, as-is, deliberately
+// skipping a SIS lookup: the teacher's own assertion is the source of truth
+// here, only format-checked before it reaches the cluster.
 okdRouter.post('/namespaces/:id', requireAllowed, async (req, res) => {
   const user = req.user as User
   const name = req.params.id
@@ -55,9 +59,19 @@ okdRouter.post('/namespaces/:id', requireAllowed, async (req, res) => {
     return
   }
 
-  const { courseId } = req.body as { courseId?: string }
+  const { courseId, usernames: manualUsernames } = req.body as {
+    courseId?: string
+    usernames?: string[]
+  }
   if (!courseId) {
     res.status(400).json({ message: 'courseId is required' })
+    return
+  }
+
+  const extraUsernames = Array.isArray(manualUsernames) ? manualUsernames : []
+  const invalid = extraUsernames.filter((u) => !isValidUsername(u))
+  if (invalid.length > 0) {
+    res.status(400).json({ message: `Invalid username(s): ${invalid.join(', ')}` })
     return
   }
 
@@ -83,10 +97,12 @@ okdRouter.post('/namespaces/:id', requireAllowed, async (req, res) => {
     [END_DATE_ANNOTATION]: endDate,
     [COURSE_ANNOTATION]: courseId,
   })
-  // Grant the provisioner admin in the namespace they just created. This covers
-  // both a single course namespace and each group namespace (one POST per
-  // group), so the teacher always has admin on everything they provision.
-  await grantNamespaceAdmin(name, [user.username])
+  // Grant the provisioner - and any manually-added usernames for this
+  // namespace - admin in the namespace they just created. This covers both a
+  // single course namespace and each group namespace (one POST per group), so
+  // the teacher always has admin on everything they provision, alongside
+  // whoever else they named for that particular namespace.
+  await grantNamespaceAdmin(name, [...new Set([user.username, ...extraUsernames])])
 
   res.status(201).json({ name, endDate })
 })

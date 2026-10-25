@@ -38,6 +38,21 @@ export function validateNsName(name: string): string | null {
   return null
 }
 
+// Format guard for a manually-typed uid (e.g. a TA added by username rather
+// than picked from the course roster). isValidUsername on the backend is the
+// authoritative check (and allows up to 64 characters); this one is just for
+// inline form feedback, capped tighter at 12 to match real uid lengths.
+export const USERNAME_MAX = 12
+const USERNAME_RE = /^[a-zA-Z0-9._-]{1,64}$/
+
+export function validateUsername(name: string): string | null {
+  const n = name.trim()
+  if (!n) return 'Required'
+  if (n.length > USERNAME_MAX) return `Too long (max ${USERNAME_MAX} characters)`
+  if (!USERNAME_RE.test(n)) return 'Use letters, digits, dots, hyphens and underscores only'
+  return null
+}
+
 // The uid (part of eduPersonPrincipalName before '@') — the same identifier the
 // backend grants namespace access to. Falls back to the student number.
 export const studentUsername = (s: Student): string =>
