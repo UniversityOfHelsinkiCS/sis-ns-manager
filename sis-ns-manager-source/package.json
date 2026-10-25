@@ -10,6 +10,7 @@
     "build": "vite build",
     "start": "NODE_ENV=production node --experimental-strip-types backend/index.ts",
     "lint": "eslint './**/*.{ts,tsx}'",
+    "test": "NODE_ENV=test node --test 'backend/**/*.test.ts'",
     "preview": "vite preview"
   },
   "dependencies": {
