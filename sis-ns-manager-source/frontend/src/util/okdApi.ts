@@ -15,6 +15,13 @@ export const addNamespaceUsers = (name: string, studentNumbers: string[]) =>
     studentNumbers,
   })
 
+export const getNamespaceUsers = async (name: string): Promise<string[]> => {
+  const { data } = await axios.get<{ namespace: string; users: string[] }>(
+    `/api/okd/namespaces/${encodeURIComponent(name)}/users`,
+  )
+  return data.users
+}
+
 export const deleteNamespace = (name: string) =>
   axios.delete(`/api/okd/namespaces/${encodeURIComponent(name)}`)
 

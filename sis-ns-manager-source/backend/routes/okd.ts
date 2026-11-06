@@ -9,9 +9,10 @@ import {
   createProject,
   patchNamespaceAnnotations,
   grantNamespaceAdmin,
+  getAdminGroupMembers,
 } from '../utils/okdClient.ts'
 import { isDemoUser, isValidNamespaceName, isValidUsername } from '../utils/validations.ts'
-import { demoNamespaces } from '../utils/demoData.ts'
+import { demoNamespaces, getDemoNamespaceUsers } from '../utils/demoData.ts'
 import requireAllowed from '../middleware/requireAllowed.ts'
 import requireNamespaceOwner from '../middleware/requireNamespaceOwner.ts'
 
@@ -125,6 +126,18 @@ okdRouter.delete('/namespaces/:id', [requireAllowed, requireNamespaceOwner], asy
   await patchNamespaceAnnotations(name, { [END_DATE_ANNOTATION]: endDate })
 
   res.json({ name, endDate })
+})
+
+// GET /api/okd/namespaces/:id/users — usernames that currently have admin in
+// the namespace (its admin Group's members). Read-only; lets the UI mark
+// students who are already in a group when adding more groups to a course.
+okdRouter.get('/namespaces/:id/users', [requireAllowed, requireNamespaceOwner], async (req, res) => {
+  const user = req.user as User
+  const name = req.params.id
+
+  const users = isDemoUser(user) ? getDemoNamespaceUsers(name) : await getAdminGroupMembers(name)
+
+  res.json({ namespace: name, users })
 })
 
 // POST /api/okd/namespaces/:id/users — grant the given students admin in the

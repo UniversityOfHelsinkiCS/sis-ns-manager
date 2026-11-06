@@ -10,9 +10,10 @@ interface Props {
   namespaces: NamespaceInfo[]
   onClose: () => void
   onDeleted: () => void
+  onAddGroups: () => void
 }
 
-export function ManageModal({ course, namespaces, onClose, onDeleted }: Props) {
+export function ManageModal({ course, namespaces, onClose, onDeleted, onAddGroups }: Props) {
   const [confirmation, setConfirmation] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -184,6 +185,19 @@ export function ManageModal({ course, namespaces, onClose, onDeleted }: Props) {
             ))}
           </tbody>
         </table>
+        {/* E.g. for students who registered for the course after the groups
+            were created. */}
+        {groupMode && (
+          <div className="manage-add-groups">
+            <button
+              className="btn btn--secondary btn--sm"
+              onClick={onAddGroups}
+              disabled={loading}
+            >
+              Add new groups
+            </button>
+          </div>
+        )}
       </div>
 
       {canDelete ? (

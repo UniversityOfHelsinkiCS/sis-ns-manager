@@ -6,7 +6,14 @@ interface Props {
   students: Student[]
   onApply: (groups: ParsedGroup[]) => void
   disabled?: boolean
+  // Replaces the default explanation below the textarea.
+  note?: string
 }
+
+const DEFAULT_NOTE =
+  "Usernames must be on the course's students list. Students not listed " +
+  'stay unassigned. Applying replaces the current groups and clears users ' +
+  'added by username.'
 
 const PLACEHOLDER = `- name: course-2026-1
   users: [alice, bob]
@@ -18,7 +25,7 @@ const PLACEHOLDER = `- name: course-2026-1
 // Paste a YAML (or JSON) group list to set group names and assignments in one
 // go. Nothing is applied unless the whole list is valid and every user is on
 // the course roster.
-export function GroupListImport({ students, onApply, disabled }: Props) {
+export function GroupListImport({ students, onApply, disabled, note = DEFAULT_NOTE }: Props) {
   const [open, setOpen] = useState(false)
   const [text, setText] = useState('')
   const [errors, setErrors] = useState<string[]>([])
@@ -71,11 +78,7 @@ export function GroupListImport({ students, onApply, disabled }: Props) {
         spellCheck={false}
         autoComplete="off"
       />
-      <p className="modal-note">
-        Usernames must be on the course's students list. Students not listed
-        stay unassigned. Applying replaces the current groups and clears
-        users added by username.
-      </p>
+      <p className="modal-note">{note}</p>
 
       {errors.map(err => (
         <span key={err} className="modal-field__error">{err}</span>

@@ -90,6 +90,9 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  /* Large courses: scroll within the box instead of stretching the modal. */
+  max-height: 320px;
+  overflow-y: auto;
 }
 
 /* Student row */
@@ -132,6 +135,20 @@
   min-width: 0;
   flex: 1 1 auto;
   text-align: right;
+}
+
+/* Already in an existing group namespace (Add new groups) */
+.sga__student-badge {
+  flex-shrink: 0;
+  max-width: 40%;
+  font-size: 10px;
+  color: #2e7d32;
+  background: #e8f5e9;
+  border-radius: 10px;
+  padding: 1px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sga__student-select {

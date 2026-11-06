@@ -23,6 +23,18 @@ interface Props {
   students: Student[]
   onClose: () => void
   onCreated: () => void
+  // Set when adding groups to a course that already has group namespaces
+  // (e.g. for late registrants): the modal is then group-only, numbers the new
+  // groups after the existing ones and marks students already in a group.
+  existing?: ExistingGroups
+}
+
+export interface ExistingGroups {
+  names: string[]
+  // username -> existing namespaces the user already has access to
+  groupedIn: Record<string, string[]>
+  // Some namespaces' memberships couldn't be loaded, so badges may be missing.
+  partial: boolean
 }
 
 // A teacher-typed username (e.g. a TA not on the roster), plus which of the
@@ -37,22 +49,28 @@ const INITIAL_GROUPS = 4
 
 // Fill in default names for groups 1..count, keeping every name the user has
 // already edited (including ones above the current count, so lowering then
-// raising the count doesn't lose them).
+// raising the count doesn't lose them). `offset` shifts the default suffix past
+// existing groups (adding group 1 after 3 existing ones suggests `-4`).
 const buildGroupNames = (
   course: CourseUnitRealisation,
   count: number,
   prev: Record<number, string> = {},
+  offset = 0,
 ): Record<number, string> => {
   const next: Record<number, string> = { ...prev }
-  for (let g = 1; g <= count; g++) next[g] = prev[g] ?? courseNsName(course, `-${g}`)
+  for (let g = 1; g <= count; g++) next[g] = prev[g] ?? courseNsName(course, `-${offset + g}`)
   return next
 }
 
-export function CreateNamespaceModal({ course, nsName, students, onClose, onCreated }: Props) {
+export function CreateNamespaceModal({ course, nsName, students, onClose, onCreated, existing }: Props) {
+  const adding = existing !== undefined
+  const offset = existing?.names.length ?? 0
+  const initialGroups = adding ? 1 : INITIAL_GROUPS
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [createGroups, setCreateGroups] = useState(false)
-  const [groupCount, setGroupCount] = useState(INITIAL_GROUPS)
+  const [createGroups, setCreateGroups] = useState(adding)
+  const [groupCount, setGroupCount] = useState(initialGroups)
   const [assignment, setAssignment] = useState<GroupAssignment>({})
 
   // User-defined namespace names: one for the single-namespace case, and one per
@@ -60,7 +78,7 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
   // course name; fully editable.
   const [name, setName] = useState(nsName)
   const [groupNames, setGroupNames] = useState<Record<number, string>>(() =>
-    buildGroupNames(course, INITIAL_GROUPS),
+    buildGroupNames(course, initialGroups, {}, offset),
   )
 
   // Users added by username rather than picked from the course roster.
@@ -79,7 +97,7 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
       for (const [id, g] of Object.entries(prev)) next[id] = g > n ? 0 : g
       return next
     })
-    setGroupNames(prev => buildGroupNames(course, n, prev))
+    setGroupNames(prev => buildGroupNames(course, n, prev, offset))
   }
 
   // Replace the whole group setup with a pasted list. Students the list doesn't
@@ -106,13 +124,23 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
     .filter(g => groupSizes[g - 1] > 0)
 
   const nameError = validateNsName(name)
+  // A group name is also invalid if one of the course's existing namespaces
+  // already uses it (adding groups only).
+  const groupNameError = (g: number): string | null => {
+    const n = (groupNames[g] ?? '').trim()
+    return validateNsName(n) ?? (existing?.names.includes(n) ? 'Already exists in this course' : null)
+  }
   const activeGroupNames = activeGroups.map(g => (groupNames[g] ?? '').trim())
   const duplicateName =
     activeGroupNames.find((n, i) => n && activeGroupNames.indexOf(n) !== i) ?? null
   const groupsValid =
     activeGroups.length > 0 &&
-    activeGroups.every(g => !validateNsName(groupNames[g] ?? '')) &&
+    activeGroups.every(g => !groupNameError(g)) &&
     !duplicateName
+
+  // Display label for a group: its name, or its number counted after any
+  // existing groups.
+  const groupLabel = (g: number) => (groupNames[g] ?? '').trim() || `Group ${offset + g}`
 
   const canCreate = !loading && (createGroups ? groupsValid : !nameError)
 
@@ -182,7 +210,7 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
   const roster = [...students].sort(byStudentUsername)
 
   return (
-    <Modal title="Create namespace" onClose={onClose}>
+    <Modal title={adding ? 'Add new groups' : 'Create namespace'} onClose={onClose}>
       <div className="modal-field">
         <span className="modal-field__label">Course</span>
         <span className="modal-field__text">{displayName}</span>
@@ -192,23 +220,36 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
         <span className="modal-field__text">{formatDate(getActiveUntil(course))}</span>
       </div>
 
-      <label className="modal-checkbox">
-        <input
-          type="checkbox"
-          checked={createGroups}
-          onChange={e => {
-            // Manually-added users carry a per-group assignment that only
-            // means something in the mode they were added in (empty in single
-            // mode, so they'd silently match no group after switching to group
-            // mode) - clear them on every switch rather than carry over.
-            setCreateGroups(e.target.checked)
-            setManualUsers([])
-            setManualUsername('')
-            setManualUserGroups(new Set())
-          }}
-        />
-        <span>Create group namespaces</span>
-      </label>
+      {adding ? (
+        <div className="modal-field">
+          <span className="modal-field__label">Existing groups ({existing.names.length})</span>
+          <span className="modal-field__text">{existing.names.join(', ')}</span>
+          {existing.partial && (
+            <span className="modal-field__error">
+              Couldn't load existing memberships for some groups — students in
+              them aren't marked below.
+            </span>
+          )}
+        </div>
+      ) : (
+        <label className="modal-checkbox">
+          <input
+            type="checkbox"
+            checked={createGroups}
+            onChange={e => {
+              // Manually-added users carry a per-group assignment that only
+              // means something in the mode they were added in (empty in single
+              // mode, so they'd silently match no group after switching to group
+              // mode) - clear them on every switch rather than carry over.
+              setCreateGroups(e.target.checked)
+              setManualUsers([])
+              setManualUsername('')
+              setManualUserGroups(new Set())
+            }}
+          />
+          <span>Create group namespaces</span>
+        </label>
+      )}
 
       {!createGroups && (
         <>
@@ -252,7 +293,18 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
 
       {createGroups && (
         <div className="modal-groups">
-          <GroupListImport students={students} onApply={applyGroupList} disabled={loading} />
+          <GroupListImport
+            students={students}
+            onApply={applyGroupList}
+            disabled={loading}
+            note={
+              adding
+                ? "Usernames must be on the course's students list. Applying " +
+                  'replaces the new groups below (existing groups are not ' +
+                  'changed) and clears users added by username.'
+                : undefined
+            }
+          />
 
           <div className="modal-field modal-field--row">
             <label htmlFor={`gc-${course.id}`} className="modal-field__label">
@@ -276,12 +328,12 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
               // typed something — the name can be set before any assignment.
               const err =
                 size > 0 || (groupNames[g] ?? '').trim()
-                  ? validateNsName(groupNames[g] ?? '')
+                  ? groupNameError(g)
                   : null
               return (
                 <div key={g} className="modal-groups__name-row">
                   <label className="modal-groups__name-label" htmlFor={`gn-${course.id}-${g}`}>
-                    Group {g} <span className="modal-groups__name-count">· {size}</span>
+                    Group {offset + g} <span className="modal-groups__name-count">· {size}</span>
                   </label>
                   <input
                     id={`gn-${course.id}-${g}`}
@@ -311,9 +363,14 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
             groupCount={groupCount}
             assignment={assignment}
             onChange={setAssignment}
+            firstGroupNumber={offset + 1}
+            groupedIn={existing?.groupedIn}
           />
 
-          <p className="modal-note">You'll be added as admin to each group namespace.</p>
+          <p className="modal-note">
+            You'll be added as admin to each {adding ? 'new ' : ''}group namespace.
+            {adding && ' Students marked as already in a group keep that access.'}
+          </p>
         </div>
       )}
 
@@ -368,7 +425,7 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
                     checked={manualUserGroups.has(g)}
                     onChange={() => toggleManualUserGroup(g)}
                   />
-                  <span>{(groupNames[g] ?? '').trim() || `Group ${g}`}</span>
+                  <span>{groupLabel(g)}</span>
                 </label>
               ))
             )}
@@ -382,7 +439,7 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
                 <span className="modal-manual-users__name">{u.username}</span>
                 {createGroups && (
                   <span className="modal-manual-users__item-groups">
-                    {u.groups.map(g => (groupNames[g] ?? '').trim() || `Group ${g}`).join(', ')}
+                    {u.groups.map(groupLabel).join(', ')}
                   </span>
                 )}
                 <button
@@ -414,7 +471,7 @@ export function CreateNamespaceModal({ course, nsName, students, onClose, onCrea
           {loading
             ? 'Creating…'
             : createGroups
-            ? `Create ${activeGroups.length} group namespace${activeGroups.length !== 1 ? 's' : ''}`
+            ? `${adding ? 'Add' : 'Create'} ${activeGroups.length} group namespace${activeGroups.length !== 1 ? 's' : ''}`
             : 'Create namespace'}
         </button>
       </div>
