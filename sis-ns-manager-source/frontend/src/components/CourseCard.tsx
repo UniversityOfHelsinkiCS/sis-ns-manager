@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import type { CourseUnitRealisation, NamespaceInfo, Student } from '@common/types'
 import { getActiveUntil, getCourseEndDate, formatDate, courseNsName } from '../utils'
-import { CreateNamespaceModal } from './CreateNamespaceModal'
+import { CreateNamespaceModal, type ExistingGroups } from './CreateNamespaceModal'
 import { ManageModal } from './ManageModal'
 import useApi from '../util/useApi'
-import type { NamespaceSummary } from '../util/okdApi'
+import { getNamespaceUsers, type NamespaceSummary } from '../util/okdApi'
 import './CourseCard.css'
 
 interface Props {
@@ -59,11 +59,44 @@ export function CourseCard({ course }: Props) {
   const [open, setCreateOpen] = useState(false)
   const [manageOpen, setManageOpen] = useState(false)
   const [students, setStudents] = useState<Student[]>([])
+  // Set while the create modal is open in "Add new groups" mode.
+  const [existingGroups, setExistingGroups] = useState<ExistingGroups | undefined>()
+
+  async function fetchStudents() {
+    const response = await fetch(`/api/sis/courses/${course.id}/students`)
+    setStudents(await response.json())
+  }
 
   async function handleCreateOpen() {
-    const response = await fetch(`/api/sis/courses/${course.id}/students`)
-    const data = await response.json()
-    setStudents(data)
+    await fetchStudents()
+    setExistingGroups(undefined)
+    setCreateOpen(true)
+  }
+
+  // Opened from the Manage modal: load the roster plus who is already in each
+  // existing group namespace, so those students can be marked.
+  async function handleAddGroupsOpen() {
+    const names = existingNamespaces.map((ns) => ns.name)
+    const [, memberships] = await Promise.all([
+      fetchStudents(),
+      Promise.allSettled(names.map(getNamespaceUsers)),
+    ])
+
+    const groupedIn: Record<string, string[]> = {}
+    memberships.forEach((result, i) => {
+      if (result.status !== 'fulfilled') return
+      for (const user of result.value) {
+        const key = user.toLowerCase()
+        groupedIn[key] = [...(groupedIn[key] ?? []), names[i]]
+      }
+    })
+
+    setExistingGroups({
+      names,
+      groupedIn,
+      partial: memberships.some((result) => result.status === 'rejected'),
+    })
+    setManageOpen(false)
     setCreateOpen(true)
   }
 
@@ -119,6 +152,7 @@ export function CourseCard({ course }: Props) {
           students={students}
           onClose={() => setCreateOpen(false)}
           onCreated={() => { refetch(); setCreateOpen(false) }}
+          existing={existingGroups}
         />
       )}
       {manageOpen && (
@@ -127,6 +161,7 @@ export function CourseCard({ course }: Props) {
           namespaces={existingNamespaces}
           onClose={() => setManageOpen(false)}
           onDeleted={() => { refetch() }}
+          onAddGroups={handleAddGroupsOpen}
         />
       )}
     </>

@@ -30,10 +30,6 @@ export default defineConfig(({ mode }) => {
             })
           },
         },
-        '/tietosuojaseloste': {
-          target: backendUrl,
-          changeOrigin: true,
-        },
       },
     },
   }

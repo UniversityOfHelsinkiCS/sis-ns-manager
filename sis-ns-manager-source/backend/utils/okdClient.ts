@@ -106,6 +106,21 @@ const GROUP_API = { group: 'user.openshift.io', version: 'v1', plural: 'groups' 
 const ADMIN_ROLEBINDING = 'sis-ns-manager-admin'
 const adminGroupName = (namespace: string) => `sis-ns-manager-${namespace}`
 
+// Current members of the namespace's admin Group, or [] if it doesn't exist yet.
+export const getAdminGroupMembers = async (namespace: string): Promise<string[]> => {
+  const { custom } = clients()
+  try {
+    const group = (await custom.getClusterCustomObject({
+      ...GROUP_API,
+      name: adminGroupName(namespace),
+    })) as unknown as { users?: string[] }
+    return group.users ?? []
+  } catch (err) {
+    if (errStatus(err) === 404) return []
+    throw err
+  }
+}
+
 // Create the namespace's admin Group with `usernames`, or add them to it if it
 // already exists (membership is the union). The group is owned by the namespace,
 // so it is garbage-collected when the namespace is deleted.

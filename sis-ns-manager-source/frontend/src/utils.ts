@@ -14,14 +14,29 @@ export function getActiveUntil(course: CourseUnitRealisation): Date {
   return end
 }
 
-export function courseNsName(course: CourseUnitRealisation): string {
-  const name = (course.name.fi ?? course.name.en ?? course.id) as string
-  const slug = name
+// Lowercase a-z0-9 with hyphens, at most `max` characters. Accents are dropped
+// rather than turned into hyphens (ä -> a, ö -> o): NFD splits "ä" into "a" +
+// a combining mark, and the marks are then removed.
+const slugify = (text: string, max: number): string =>
+  text
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-  const year = new Date(course.activityPeriod.startDate as string).getFullYear()
-  return `tkt-cs-${slug}-${year}`
+    .replace(/^-+/, '')
+    .slice(0, max)
+    .replace(/-+$/, '')
+
+// Default namespace name, `<slug>-<year><suffix>` (suffix e.g. `-3` for group
+// 3). The slug is shortened so the whole name fits NS_NAME_MAX — the year and
+// suffix are always kept.
+export function courseNsName(course: CourseUnitRealisation, suffix = ''): string {
+  const name = (course.name.fi ?? course.name.en ?? course.id) as string
+  const tail = `-${new Date(course.activityPeriod.startDate as string).getFullYear()}${suffix}`
+  const max = NS_NAME_MAX - tail.length
+  // Fall back to the course id if the name has no usable characters.
+  const slug = slugify(name, max) || slugify(course.id, max)
+  return `${slug}${tail}`
 }
 
 // RFC 1123 label — the constraint Kubernetes puts on namespace / OpenShift
@@ -35,6 +50,21 @@ export function validateNsName(name: string): string | null {
   if (!n) return 'Required'
   if (n.length > NS_NAME_MAX) return `Too long (max ${NS_NAME_MAX} characters)`
   if (!NS_NAME_RE.test(n)) return 'Use lowercase letters, digits and hyphens only'
+  return null
+}
+
+// Format guard for a manually-typed uid (e.g. a TA added by username rather
+// than picked from the course roster). isValidUsername on the backend is the
+// authoritative check (and allows up to 64 characters); this one is just for
+// inline form feedback, capped tighter at 12 to match real uid lengths.
+export const USERNAME_MAX = 12
+const USERNAME_RE = /^[a-zA-Z0-9._-]{1,64}$/
+
+export function validateUsername(name: string): string | null {
+  const n = name.trim()
+  if (!n) return 'Required'
+  if (n.length > USERNAME_MAX) return `Too long (max ${USERNAME_MAX} characters)`
+  if (!USERNAME_RE.test(n)) return 'Use letters, digits, dots, hyphens and underscores only'
   return null
 }
 

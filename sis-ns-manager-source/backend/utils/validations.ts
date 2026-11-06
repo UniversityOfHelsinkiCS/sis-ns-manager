@@ -20,3 +20,11 @@ export const isValidNamespaceName = (name: unknown): name is string =>
   name.length >= 1 &&
   name.length <= 63 &&
   NAMESPACE_NAME_RE.test(name)
+
+// Format guard for a teacher-supplied uid (see okd.ts POST /namespaces/:id/users
+// `usernames`): these are granted directly, without a SIS lookup, so this is
+// the only check standing between user input and the cluster API.
+const USERNAME_RE = /^[a-zA-Z0-9._-]{1,64}$/
+
+export const isValidUsername = (name: unknown): name is string =>
+  typeof name === 'string' && USERNAME_RE.test(name)

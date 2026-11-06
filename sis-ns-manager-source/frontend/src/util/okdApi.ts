@@ -7,13 +7,20 @@ export type NamespaceSummary = {
   course: string | null
 }
 
-export const createNamespace = (name: string, courseId: string) =>
-  axios.post(`/api/okd/namespaces/${encodeURIComponent(name)}`, { courseId })
+export const createNamespace = (name: string, courseId: string, usernames: string[] = []) =>
+  axios.post(`/api/okd/namespaces/${encodeURIComponent(name)}`, { courseId, usernames })
 
 export const addNamespaceUsers = (name: string, studentNumbers: string[]) =>
   axios.post(`/api/okd/namespaces/${encodeURIComponent(name)}/users`, {
     studentNumbers,
   })
+
+export const getNamespaceUsers = async (name: string): Promise<string[]> => {
+  const { data } = await axios.get<{ namespace: string; users: string[] }>(
+    `/api/okd/namespaces/${encodeURIComponent(name)}/users`,
+  )
+  return data.users
+}
 
 export const deleteNamespace = (name: string) =>
   axios.delete(`/api/okd/namespaces/${encodeURIComponent(name)}`)
