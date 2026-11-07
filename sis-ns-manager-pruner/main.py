@@ -71,6 +71,7 @@ def main() -> None:
         # to the destructive call.
         if is_protected(name):
             print(f"{name}: protected system namespace, skipping")
+            continue
         end_date_str = (ns.metadata.annotations or {}).get(END_DATE_ANNOTATION)
         if not end_date_str:
             print(f"{name}: missing {END_DATE_ANNOTATION} annotation, skipping")
