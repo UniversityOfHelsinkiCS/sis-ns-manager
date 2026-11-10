@@ -140,34 +140,53 @@ okdRouter.get('/namespaces/:id/users', [requireAllowed, requireNamespaceOwner], 
   res.json({ namespace: name, users })
 })
 
-// POST /api/okd/namespaces/:id/users — grant the given students admin in the
-// namespace. Students are identified by student number; their uid is derived
-// from eduPersonPrincipalName (the part before '@').
+// POST /api/okd/namespaces/:id/users — grant users admin in the namespace.
+// body.studentNumbers are course students, resolved through SIS: their uid is
+// derived from eduPersonPrincipalName (the part before '@'). body.usernames are
+// uids the teacher typed in directly (e.g. adding a TA to an existing group) -
+// granted as-is without a SIS lookup, like the manual usernames at creation,
+// only format-checked. Either or both may be given.
 okdRouter.post('/namespaces/:id/users', [requireAllowed, requireNamespaceOwner], async (req, res) => {
   const user = req.user as User
   const name = req.params.id
 
-  const { studentNumbers } = req.body as { studentNumbers?: string[] }
-  if (!Array.isArray(studentNumbers) || studentNumbers.length === 0) {
-    res.status(400).json({ message: 'studentNumbers array is required' })
+  const { studentNumbers, usernames: manualUsernames } = req.body as {
+    studentNumbers?: string[]
+    usernames?: string[]
+  }
+  const numbers = Array.isArray(studentNumbers) ? studentNumbers : []
+  const directUsernames = Array.isArray(manualUsernames) ? manualUsernames : []
+  if (numbers.length === 0 && directUsernames.length === 0) {
+    res.status(400).json({ message: 'studentNumbers or usernames is required' })
     return
   }
 
-  const students = await getStudentsByNumbers(user, studentNumbers)
-
-  // A non-empty request that resolves to zero SIS records means the lookup
-  // failed rather than succeeded with an empty set — surface it instead of
-  // returning a misleading 201 that grants no one.
-  if (students.length === 0) {
-    res.status(502).json({
-      message: 'SIS returned no records for the given student numbers',
-    })
+  const invalid = directUsernames.filter((u) => !isValidUsername(u))
+  if (invalid.length > 0) {
+    res.status(400).json({ message: `Invalid username(s): ${invalid.join(', ')}` })
     return
   }
 
-  const usernames = students
-    .map((student) => student.eduPersonPrincipalName?.split('@')[0])
-    .filter((uid): uid is string => Boolean(uid))
+  let studentUsernames: string[] = []
+  if (numbers.length > 0) {
+    const students = await getStudentsByNumbers(user, numbers)
+
+    // A non-empty request that resolves to zero SIS records means the lookup
+    // failed rather than succeeded with an empty set — surface it instead of
+    // returning a misleading 201 that grants no one.
+    if (students.length === 0) {
+      res.status(502).json({
+        message: 'SIS returned no records for the given student numbers',
+      })
+      return
+    }
+
+    studentUsernames = students
+      .map((student) => student.eduPersonPrincipalName?.split('@')[0])
+      .filter((uid): uid is string => Boolean(uid))
+  }
+
+  const usernames = [...new Set([...studentUsernames, ...directUsernames])]
 
   if (!isDemoUser(user)) {
     await grantNamespaceAdmin(name, usernames)

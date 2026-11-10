@@ -41,6 +41,40 @@
   color: #c62828;
 }
 
+/* View + Delete side by side */
+.ns-table__actions > * + * {
+  margin-left: 6px;
+}
+
+/* Inline members panel under a namespace row */
+.ns-members-row td {
+  background: #fafafa;
+  padding: 12px 10px;
+}
+
+.ns-members {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ns-members__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #616161;
+}
+
+.ns-members__status {
+  font-size: 12px;
+  color: #9e9e9e;
+}
+
+.ns-members__add {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .ns-row-confirm-row td {
   background: #fff5f5;
   padding: 12px 10px;

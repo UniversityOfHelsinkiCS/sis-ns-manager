@@ -15,6 +15,16 @@ export const addNamespaceUsers = (name: string, studentNumbers: string[]) =>
     studentNumbers,
   })
 
+// Grant usernames typed in by the teacher (no SIS lookup) admin in an existing
+// namespace. Resolves to the usernames that were granted.
+export const addNamespaceUsernames = async (name: string, usernames: string[]): Promise<string[]> => {
+  const { data } = await axios.post<{ namespace: string; users: string[] }>(
+    `/api/okd/namespaces/${encodeURIComponent(name)}/users`,
+    { usernames },
+  )
+  return data.users
+}
+
 export const getNamespaceUsers = async (name: string): Promise<string[]> => {
   const { data } = await axios.get<{ namespace: string; users: string[] }>(
     `/api/okd/namespaces/${encodeURIComponent(name)}/users`,
