@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import type { CourseUnitRealisation } from '@common/types'
 import { CourseCard } from './components/CourseCard'
 import { ADMIN_EMAIL } from './utils'
 import './App.css'
 import useRequiredUser from './util/useRequiredUser'
 import useApi from './util/useApi'
+import type { NamespaceSummary } from './util/okdApi'
 
 export default function App() {
   const { user, isLoading: isUserLoading, isUnauthorized } = useRequiredUser()
@@ -14,6 +15,28 @@ export default function App() {
   const [coursesLoaded, setCoursesLoaded] = useState(false)
 
   const hasAccess = Boolean(user && user.isAllowed)
+
+  // Same query key as CourseCard, so this shares its request and cache - a
+  // card's refetch after create/delete re-sorts the list too.
+  const { data: namespaces, isLoading: namespacesLoading } = useApi<NamespaceSummary[]>(
+    'namespaces',
+    '/api/okd/namespaces',
+    'GET',
+    undefined,
+    { enabled: hasAccess },
+  )
+
+  // Courses that already have namespaces (and so a Manage button) first; each
+  // part keeps the start-date order from loadCourses (Array.sort is stable).
+  const sortedCourses = useMemo(() => {
+    const withNamespaces = new Set(
+      (Array.isArray(namespaces) ? namespaces : [])
+        .map(ns => ns.course)
+        .filter((id): id is string => Boolean(id)),
+    )
+    const rank = (c: CourseUnitRealisation) => (withNamespaces.has(c.id) ? 0 : 1)
+    return [...courses].sort((a, b) => rank(a) - rank(b))
+  }, [courses, namespaces])
 
   useEffect(() => {
     if (!hasAccess) return
@@ -106,7 +129,8 @@ export default function App() {
                 </p>
               </div>
 
-              {!coursesLoaded ? null : courses.length === 0 ? (
+              {/* Wait for namespaces too, so cards don't jump into order. */}
+              {!coursesLoaded || namespacesLoading ? null : courses.length === 0 ? (
                 <div className="access-notice">
                   <h2 className="access-notice__title">No courses</h2>
                   <p className="access-notice__text">
@@ -118,7 +142,7 @@ export default function App() {
                 </div>
               ) : (
                 <div className="course-grid">
-                  {courses.map(course => (
+                  {sortedCourses.map(course => (
                     <CourseCard key={course.id} course={course} />
                   ))}
                 </div>

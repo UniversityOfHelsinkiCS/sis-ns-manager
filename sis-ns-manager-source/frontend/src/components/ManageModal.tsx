@@ -1,8 +1,10 @@
 import { Fragment, useState } from 'react'
-import type { CourseUnitRealisation, NamespaceInfo } from '@common/types'
+import type { CourseUnitRealisation, NamespaceInfo, Student } from '@common/types'
 import { Modal } from './Modal'
-import { formatDate, getActiveUntil, ADMIN_EMAIL } from '../utils'
+import { NamespaceMembers } from './NamespaceMembers'
+import { formatDate, getActiveUntil, studentUsername, ADMIN_EMAIL } from '../utils'
 import { deleteNamespace, errorMessage } from '../util/okdApi'
+import { getCourseStudents } from '../util/sisApi'
 import './ManageModal.css'
 
 interface Props {
@@ -22,6 +24,14 @@ export function ManageModal({ course, namespaces, onClose, onDeleted, onAddGroup
   // inline type-to-confirm is currently open, and the text typed into it.
   const [rowConfirm, setRowConfirm] = useState<string | null>(null)
   const [rowInput, setRowInput] = useState('')
+
+  // The namespace whose members panel is open.
+  const [viewing, setViewing] = useState<string | null>(null)
+  // Course roster keyed by lowercased username, used to show members' names.
+  // Fetched once, the first time a members panel is opened; stays null if that
+  // fails (members are then listed by username only).
+  const [roster, setRoster] = useState<Map<string, Student> | null>(null)
+  const [rosterRequested, setRosterRequested] = useState(false)
 
   // Namespaces already scheduled for deletion — seeded from the current data
   // (endDate pulled forward well before the normal grace window) and extended
@@ -95,7 +105,21 @@ export function ManageModal({ course, namespaces, onClose, onDeleted, onAddGroup
     }
   }
 
+  function toggleView(name: string) {
+    setViewing(prev => (prev === name ? null : name))
+    if (!rosterRequested) {
+      setRosterRequested(true)
+      getCourseStudents(course.id)
+        .then(students =>
+          setRoster(new Map(students.map(s => [studentUsername(s).toLowerCase(), s]))),
+        )
+        .catch(() => { /* names are optional - show usernames only */ })
+    }
+  }
+
   const confirmed = confirmation === confirmToken
+  // Columns: name, (group), created, actions.
+  const columnCount = groupMode ? 4 : 3
 
   return (
     <Modal title={`Manage — ${course.id}`} onClose={onClose}>
@@ -114,7 +138,7 @@ export function ManageModal({ course, namespaces, onClose, onDeleted, onAddGroup
               <th>Name</th>
               {groupMode && <th>Group</th>}
               <th>Created</th>
-              {groupMode && <th></th>}
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -128,9 +152,16 @@ export function ManageModal({ course, namespaces, onClose, onDeleted, onAddGroup
                     </td>
                   )}
                   <td>{formatDate(ns.created)}</td>
-                  {groupMode && (
-                    <td className="ns-table__actions">
-                      {scheduled.has(ns.name) ? (
+                  <td className="ns-table__actions">
+                    <button
+                      className="btn btn--secondary btn--sm"
+                      onClick={() => toggleView(ns.name)}
+                      aria-expanded={viewing === ns.name}
+                    >
+                      {viewing === ns.name ? 'Hide' : 'View'}
+                    </button>
+                    {groupMode && (
+                      scheduled.has(ns.name) ? (
                         <span className="ns-table__scheduled">Scheduled</span>
                       ) : (
                         <button
@@ -140,13 +171,24 @@ export function ManageModal({ course, namespaces, onClose, onDeleted, onAddGroup
                         >
                           Delete
                         </button>
-                      )}
-                    </td>
-                  )}
+                      )
+                    )}
+                  </td>
                 </tr>
+                {viewing === ns.name && (
+                  <tr className="ns-members-row">
+                    <td colSpan={columnCount}>
+                      <NamespaceMembers
+                        name={ns.name}
+                        canAdd={!scheduled.has(ns.name)}
+                        roster={roster}
+                      />
+                    </td>
+                  </tr>
+                )}
                 {groupMode && rowConfirm === ns.name && (
                   <tr className="ns-row-confirm-row">
-                    <td colSpan={4}>
+                    <td colSpan={columnCount}>
                       <p className="ns-table__hint">
                         Deleting a group schedules it for removal — it stays
                         available for a 1-day grace period and is permanently

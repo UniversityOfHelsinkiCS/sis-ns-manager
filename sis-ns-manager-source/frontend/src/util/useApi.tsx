@@ -27,10 +27,14 @@ const useApi = <T = unknown,>(
   queryKey: string,
   endPoint: string,
   method: string,
-  jsonBody?: Record<string, unknown>
+  jsonBody?: Record<string, unknown>,
+  // `enabled: false` holds the request until a precondition is met (e.g. the
+  // user has access).
+  options: { enabled?: boolean } = {},
 ) => {
   const { data, isLoading, refetch } = useQuery<T>({
     queryKey: [queryKey],
+    enabled: options.enabled ?? true,
     queryFn: async () => {
       const settings = generateSettings(method, jsonBody)
       const res = await fetch(endPoint, settings)
