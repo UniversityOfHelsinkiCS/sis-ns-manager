@@ -6,7 +6,7 @@ export const COURSES_DB_URL = process.env.COURSES_DB_URL || ''
 export const inProduction = process.env.NODE_ENV === 'production' || false
 export const inDevelopment = process.env.NODE_ENV === 'development'
 export const DEV_PERSON_ID = process.env.DEV_PERSON_ID || 'hy-hlo-12345'
-export const demoOnly = process.env.DEMO_ONLY?.toLowerCase() === 'true' || false
+export const demoOnly = process.env.DEMO_ONLY?.toLowerCase() === 'true'
 
 export const OKD_TEACHERS_GROUP = process.env.OKD_TEACHERS_GROUP || 'grp-okd-teachers'
 // Name of the cluster this instance manages, shown in the frontend UI. Set per
