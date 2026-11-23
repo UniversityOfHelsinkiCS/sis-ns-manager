@@ -26,12 +26,14 @@ export const createSelfServiceCourse = async (
 
 export const createSelfServiceCourseResponsibility = async (
     course_unit_realisation_code: string,
-    responsibility: string
+    responsibility: string,
+    demo_only: boolean
 ): Promise<void> => {
   const now = new Date()
   await SelfServiceCourseResponsibility.create({
     course_unit_realisation_code,
     responsibility,
+    demo_only,
     created_at: now,
     updated_at: now
   })

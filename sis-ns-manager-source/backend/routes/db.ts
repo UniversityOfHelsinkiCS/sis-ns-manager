@@ -1,5 +1,6 @@
 import express from 'express'
 import requireCourseOwner from '../middleware/requireCourseOwner.ts'
+import { demoOnly } from '../utils/config.ts'
 import { createSelfServiceCourse, createSelfServiceCourseResponsibility } from '../utils/dbService.ts'
 
 const dbRouter = express.Router()
@@ -11,20 +12,19 @@ dbRouter.post('/allow-self-provisioning/:id', requireCourseOwner, async (
   try {
     const { id: courseId } = req.params
     const {
-        nsPrefix,
-        usernames,
-        courseName,
-        startDate,
-        endDate,
-        demoOnly
+      nsPrefix,
+      usernames,
+      courseName,
+      startDate,
+      endDate
     } = req.body
     if (typeof courseId !== 'string') {
-        res.status(400).send({ success: false })
-        return
+      res.status(400).send({ success: false })
+      return
     }
     await createSelfServiceCourse(courseId, courseName, startDate, endDate, true, demoOnly, nsPrefix)
     for (const username of usernames) {
-        await createSelfServiceCourseResponsibility(courseId, username)
+      await createSelfServiceCourseResponsibility(courseId, username, demoOnly)
     }
     res.send({ success: true })
   } catch (err) {
