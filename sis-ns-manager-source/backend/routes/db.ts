@@ -1,4 +1,5 @@
 import express from 'express'
+import type { User } from '../../common/types.ts'
 import requireCourseOwner from '../middleware/requireCourseOwner.ts'
 import { demoOnly } from '../utils/config.ts'
 import { createSelfServiceCourse, createSelfServiceCourseResponsibility } from '../utils/dbService.ts'
@@ -10,6 +11,7 @@ dbRouter.post('/allow-self-provisioning/:id', requireCourseOwner, async (
   req: express.Request, res: express.Response
 ) => {
   try {
+    const user = req.user as User
     const { id: courseId } = req.params
     const {
       nsPrefix,
@@ -26,6 +28,7 @@ dbRouter.post('/allow-self-provisioning/:id', requireCourseOwner, async (
     for (const username of usernames) {
       await createSelfServiceCourseResponsibility(courseId, username, demoOnly)
     }
+    await createSelfServiceCourseResponsibility(courseId, user.username, demoOnly)
     res.send({ success: true })
   } catch (err) {
     res.status(500).send({ success: false, error: (err as Error).message })
