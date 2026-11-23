@@ -1,6 +1,7 @@
 import express from 'express'
 import sisRouter from './sis.ts'
 import okdRouter from './okd.ts'
+import dbRouter from './db.ts'
 import passport from 'passport'
 import type { User } from '../../common/types.ts'
 import { isAllowed } from '../utils/validations.ts'
@@ -14,6 +15,7 @@ router.use(express.json())
 
 router.use('/sis', requireUser, sisRouter)
 router.use('/okd', requireUser, okdRouter)
+router.use('/db', requireUser, dbRouter)
 
 // Public: no auth, so the cluster name can be shown on the login screen too.
 router.get('/config', (_req, res) => {
