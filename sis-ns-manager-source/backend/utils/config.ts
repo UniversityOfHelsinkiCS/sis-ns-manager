@@ -2,6 +2,7 @@ import 'dotenv/config'
 import process from 'process'
 export const DATABASE_URL = process.env.SIS_API_URL || ''
 export const API_TOKEN = process.env.API_TOKEN || ''
+export const COURSES_DB_URL = process.env.COURSES_DB_URL || ''
 export const inProduction = process.env.NODE_ENV === 'production' || false
 export const inDevelopment = process.env.NODE_ENV === 'development'
 export const DEV_PERSON_ID = process.env.DEV_PERSON_ID || 'hy-hlo-12345'
@@ -12,6 +13,8 @@ export const OKD_TEACHERS_GROUP = process.env.OKD_TEACHERS_GROUP || 'grp-okd-tea
 export const CLUSTER_NAME = process.env.CLUSTER_NAME || 'local'
 // TODO: replace with the real demo account username once known.
 export const DEMO_USER_USERNAME = process.env.DEMO_USER_USERNAME || 'lztest'
+
+export const inLocal = CLUSTER_NAME === 'local' || false
 
 
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret'
