@@ -26,7 +26,7 @@ dbRouter.post('/allow-self-provisioning/:id', requireCourseOwner, async (
     } = req.body
     if (typeof courseId !== 'string') {
       console.error('Expected course ID as a string')
-      res.status(400).send({ success: false, error: 'Expected course ID as a string' })
+      res.status(400).send({ message: 'Course ID was expected as a string' })
       return
     }
     let selfServiceCourseId: number
@@ -34,7 +34,7 @@ dbRouter.post('/allow-self-provisioning/:id', requireCourseOwner, async (
       selfServiceCourseId = await createSelfServiceCourse(courseId, courseName, startDate, endDate, true, demoOnly, nsPrefix)
     } catch (err) {
       console.error(err)
-      res.status(500).send({ success: false, error: (err as Error).message })
+      res.status(500).send({ message: (err as Error).message })
       return
     }
     try {
@@ -42,16 +42,16 @@ dbRouter.post('/allow-self-provisioning/:id', requireCourseOwner, async (
         await createSelfServiceCourseResponsibility(selfServiceCourseId, username, demoOnly)
       }
       await createSelfServiceCourseResponsibility(selfServiceCourseId, user.username, demoOnly)
-      res.send({ success: true })
+      res.json({ nsPrefix, endDate })
     } catch (err) {
       await deleteSelfServiceCourse(selfServiceCourseId)
       console.error(err)
-      res.status(500).send({ success: false, error: (err as Error).message })
+      res.status(500).send({ message: (err as Error).message })
       return
     }
   } catch (err) {
     console.error(err)
-    res.status(500).send({ success: false, error: (err as Error).message })
+    res.status(500).send({ message: (err as Error).message })
   }
 })
 
