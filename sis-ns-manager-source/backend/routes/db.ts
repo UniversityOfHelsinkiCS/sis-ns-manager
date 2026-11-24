@@ -42,7 +42,7 @@ dbRouter.post('/allow-self-provisioning/:id', requireCourseOwner, async (
         await createSelfServiceCourseResponsibility(selfServiceCourseId, username, demoOnly)
       }
       await createSelfServiceCourseResponsibility(selfServiceCourseId, user.username, demoOnly)
-      res.json({ nsPrefix, endDate })
+      res.status(201).send({ nsPrefix, endDate })
     } catch (err) {
       await deleteSelfServiceCourse(selfServiceCourseId)
       console.error(err)
