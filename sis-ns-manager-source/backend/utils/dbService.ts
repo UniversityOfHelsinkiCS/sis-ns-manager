@@ -9,9 +9,9 @@ export const createSelfServiceCourse = async (
     self_service_enabled: boolean,
     demo_only: boolean,
     ns_prefix: string
-): Promise<void> => {
+): Promise<number> => {
   const now = new Date()
-  await SelfServiceCourse.create({
+  const self_service_course = await SelfServiceCourse.create({
     course_unit_realisation_code,
     source_course_name,
     start_date,
@@ -22,19 +22,29 @@ export const createSelfServiceCourse = async (
     created_at: now,
     updated_at: now
   })
+  return self_service_course.id
+}
+
+export const deleteSelfServiceCourse = async (
+    self_service_course_id: number
+): Promise<void> => {
+  await SelfServiceCourse.destroy({
+    where: { id: self_service_course_id }
+  })
 }
 
 export const createSelfServiceCourseResponsibility = async (
-    course_unit_realisation_code: string,
+    self_service_course_id: number,
     responsibility: string,
     demo_only: boolean
-): Promise<void> => {
+): Promise<number> => {
   const now = new Date()
-  await SelfServiceCourseResponsibility.create({
-    course_unit_realisation_code,
-    responsibility,
+  const self_service_course_responsibility = await SelfServiceCourseResponsibility.create({
+    self_service_course_id,
+    responsible_person_id: responsibility,
     demo_only,
     created_at: now,
     updated_at: now
   })
+  return self_service_course_responsibility.id
 }
