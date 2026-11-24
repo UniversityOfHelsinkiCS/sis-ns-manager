@@ -53,6 +53,16 @@ export function validateNsName(name: string): string | null {
   return null
 }
 
+export const NS_PREFIX_MAX = 54
+
+export function validateNsPrefix(prefix: string): string | null {
+  const p = prefix.trim()
+  if (!p) return 'Required'
+  if (p.length > NS_PREFIX_MAX) return `Too long (max ${NS_PREFIX_MAX} characters)`
+  if (!NS_NAME_RE.test(p)) return 'Use lowercase letters, digits and hyphens only'
+  return null
+}
+
 // Format guard for a manually-typed uid (e.g. a TA added by username rather
 // than picked from the course roster). isValidUsername on the backend is the
 // authoritative check (and allows up to 64 characters); this one is just for

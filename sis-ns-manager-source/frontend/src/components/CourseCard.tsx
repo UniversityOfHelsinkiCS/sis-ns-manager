@@ -3,6 +3,7 @@ import type { CourseUnitRealisation, NamespaceInfo, Student } from '@common/type
 import { getActiveUntil, getCourseEndDate, formatDate, courseNsName } from '../utils'
 import { CreateNamespaceModal, type ExistingGroups } from './CreateNamespaceModal'
 import { ManageModal } from './ManageModal'
+import { SelfProvisionModal } from './SelfProvisionModal'
 import useApi from '../util/useApi'
 import { getNamespaceUsers, type NamespaceSummary } from '../util/okdApi'
 import './CourseCard.css'
@@ -58,6 +59,7 @@ export function CourseCard({ course }: Props) {
 
   const [open, setCreateOpen] = useState(false)
   const [manageOpen, setManageOpen] = useState(false)
+  const [selfProvisionOpen, setSelfProvisionOpen] = useState(false)
   const [students, setStudents] = useState<Student[]>([])
   // Set while the create modal is open in "Add new groups" mode.
   const [existingGroups, setExistingGroups] = useState<ExistingGroups | undefined>()
@@ -133,6 +135,11 @@ export function CourseCard({ course }: Props) {
           )}
         </div>
         <div className="course-card__actions">
+          {!isActive && (
+            <button className="btn btn--primary" onClick={() => setSelfProvisionOpen(true)}>
+              Allow self-provisioning
+            </button>
+          )}
           {isActive ? (
             <button className="btn btn--manage" onClick={() => setManageOpen(true)}>
               Manage
@@ -153,6 +160,14 @@ export function CourseCard({ course }: Props) {
           onClose={() => setCreateOpen(false)}
           onCreated={() => { refetch(); setCreateOpen(false) }}
           existing={existingGroups}
+        />
+      )}
+      {selfProvisionOpen && (
+        <SelfProvisionModal
+          course={course}
+          nsPrefix={nsName}
+          onClose={() => setSelfProvisionOpen(false)}
+          onCreated={() => { refetch(); setSelfProvisionOpen(false) }}
         />
       )}
       {manageOpen && (
