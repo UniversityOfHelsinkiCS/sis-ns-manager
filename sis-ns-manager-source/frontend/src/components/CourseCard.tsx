@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import type { CourseUnitRealisation, NamespaceInfo, Student } from '@common/types'
 import { getActiveUntil, getCourseEndDate, formatDate, courseNsName } from '../utils'
 import { CreateNamespaceModal, type ExistingGroups } from './CreateNamespaceModal'
@@ -7,6 +8,7 @@ import { SelfProvisionModal } from './SelfProvisionModal'
 import useApi from '../util/useApi'
 import { getNamespaceUsers, type NamespaceSummary } from '../util/okdApi'
 import './CourseCard.css'
+import { getSelfServiceCourse } from '../util/dbApi'
 
 interface Props {
   course: CourseUnitRealisation
@@ -56,6 +58,13 @@ export function CourseCard({ course }: Props) {
     .filter((d): d is string => Boolean(d) && new Date(d) < activeUntilDate)
     .sort()[0]
   const activeUntil = formatDate(scheduledDeletion ?? activeUntilDate)
+
+  const { data: selfService } = useQuery({
+    queryKey: ['selfServiceCourse', course.id],
+    queryFn: () => getSelfServiceCourse(course.id)
+  })
+
+  const isSelfServiceEnabled = selfService?.selfServiceCourse?.selfServiceEnabled ?? false
 
   const [open, setCreateOpen] = useState(false)
   const [manageOpen, setManageOpen] = useState(false)
@@ -135,19 +144,29 @@ export function CourseCard({ course }: Props) {
           )}
         </div>
         <div className="course-card__actions">
-          {!isActive && (
-            <button className="btn btn--primary" onClick={() => setSelfProvisionOpen(true)}>
-              Allow self-provisioning
-            </button>
-          )}
-          {isActive ? (
-            <button className="btn btn--manage" onClick={() => setManageOpen(true)}>
-              Manage
-            </button>
+          {!isActive && !isSelfServiceEnabled ? (
+            <>
+              <button className="btn btn--primary" onClick={() => setSelfProvisionOpen(true)}>
+                Allow self-provisioning
+              </button>
+              <button className="btn btn--primary" onClick={handleCreateOpen}>
+                Create namespace
+              </button>
+            </>
           ) : (
-            <button className="btn btn--primary" onClick={handleCreateOpen}>
-              Create namespace
-            </button>
+            <>
+              {isActive && !isSelfServiceEnabled && (
+                <button className="btn btn--manage" onClick={() => setManageOpen(true)}>
+                  Manage
+                </button>
+              )}
+
+              {!isActive && isSelfServiceEnabled && (
+                <button className="btn btn--manage">
+                  Manage self-provisioning
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>

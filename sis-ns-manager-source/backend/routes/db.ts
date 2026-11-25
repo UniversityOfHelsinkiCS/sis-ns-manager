@@ -5,6 +5,7 @@ import { demoOnly } from '../utils/config.ts'
 import {
   createSelfServiceCourse,
   deleteSelfServiceCourse,
+  getSelfServiceCourseByCourseCode,
   createSelfServiceCourseResponsibility
 } from '../utils/dbService.ts'
 
@@ -49,6 +50,37 @@ dbRouter.post('/allow-self-provisioning/:id', requireCourseOwner, async (
       res.status(500).send({ message: (err as Error).message })
       return
     }
+  } catch (err) {
+    console.error(err)
+    res.status(500).send({ message: (err as Error).message })
+  }
+})
+
+dbRouter.get('/self-service-courses/:id', requireCourseOwner, async (
+  req: express.Request, res: express.Response
+) => {
+  try {
+    const { id: courseCode } = req.params
+    if (typeof courseCode !== 'string') {
+      console.error('Expected course code as a string')
+      res.status(400).send({ message: 'Course code was expected as a string' })
+      return
+    }
+    const selfServiceCourse = await getSelfServiceCourseByCourseCode(courseCode)
+    if (!selfServiceCourse) {
+      res.json({ selfServiceCourse: null })
+      return
+    }
+    res.json({
+      selfServiceCourse: {
+        courseCode: selfServiceCourse.course_unit_realisation_code,
+        nsPrefix: selfServiceCourse.ns_prefix,
+        selfServiceEnabled: selfServiceCourse.self_service_enabled,
+        demoOnly: selfServiceCourse.demo_only,
+        startDate: selfServiceCourse.start_date,
+        endDate: selfServiceCourse.end_date
+      }
+    })
   } catch (err) {
     console.error(err)
     res.status(500).send({ message: (err as Error).message })

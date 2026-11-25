@@ -33,6 +33,14 @@ export const deleteSelfServiceCourse = async (
   })
 }
 
+export const getSelfServiceCourseByCourseCode = async (
+    course_code: string
+): Promise<SelfServiceCourse|null> => {
+  return await SelfServiceCourse.findOne({
+    where: { course_unit_realisation_code: course_code }
+  })
+}
+
 export const createSelfServiceCourseResponsibility = async (
     self_service_course_id: number,
     responsibility: string,
