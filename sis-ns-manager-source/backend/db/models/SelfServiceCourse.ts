@@ -1,5 +1,6 @@
 // Describes the table to application code
 import { DataTypes, Model } from 'sequelize'
+import type { SelfServiceCourseResponsibility } from './SelfServiceCourseResponsibility.ts'
 
 import { sequelize } from '../sequelize.ts'
 
@@ -13,6 +14,7 @@ export class SelfServiceCourse extends Model {
   declare allowing_teacher_username: string | null
   declare demo_only: boolean
   declare ns_prefix: string
+  declare responsibilities: SelfServiceCourseResponsibility[]
   declare created_at: Date
   declare updated_at: Date
 }
