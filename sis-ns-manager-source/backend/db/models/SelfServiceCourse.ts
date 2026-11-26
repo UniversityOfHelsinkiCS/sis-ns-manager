@@ -10,6 +10,7 @@ export class SelfServiceCourse extends Model {
   declare start_date: string
   declare end_date: string
   declare self_service_enabled: boolean
+  declare allowing_teacher_username: string | null
   declare demo_only: boolean
   declare ns_prefix: string
   declare created_at: Date
@@ -43,6 +44,10 @@ SelfServiceCourse.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
+    },
+    allowing_teacher_username: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     demo_only: {
       type: DataTypes.BOOLEAN,

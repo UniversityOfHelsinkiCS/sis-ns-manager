@@ -22,6 +22,12 @@ SelfServiceCourseResponsibility.init(
     self_service_course_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: 'self_service_courses',
+        key: 'id',
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     },
     responsible_person_id: {
       type: DataTypes.TEXT,
