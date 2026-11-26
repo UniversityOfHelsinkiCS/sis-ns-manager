@@ -7,6 +7,7 @@ export const createSelfServiceCourse = async (
     start_date: string,
     end_date: string,
     self_service_enabled: boolean,
+    allowing_teacher_username: string,
     demo_only: boolean,
     ns_prefix: string
 ): Promise<number> => {
@@ -17,6 +18,7 @@ export const createSelfServiceCourse = async (
     start_date,
     end_date,
     self_service_enabled,
+    allowing_teacher_username,
     demo_only,
     ns_prefix,
     created_at: now,

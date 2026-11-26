@@ -32,7 +32,9 @@ dbRouter.post('/allow-self-provisioning/:id', requireCourseOwner, async (
     }
     let selfServiceCourseId: number
     try {
-      selfServiceCourseId = await createSelfServiceCourse(courseId, courseName, startDate, endDate, true, demoOnly, nsPrefix)
+      selfServiceCourseId = await createSelfServiceCourse(
+        courseId, courseName, startDate, endDate, true, user.username, demoOnly, nsPrefix
+      )
     } catch (err) {
       console.error(err)
       res.status(500).send({ message: (err as Error).message })
