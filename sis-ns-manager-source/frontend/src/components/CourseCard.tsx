@@ -59,7 +59,7 @@ export function CourseCard({ course }: Props) {
     .sort()[0]
   const activeUntil = formatDate(scheduledDeletion ?? activeUntilDate)
 
-  const { data: selfService } = useQuery({
+  const { data: selfService, refetch: refetchSelfService } = useQuery({
     queryKey: ['selfServiceCourse', course.id],
     queryFn: () => getSelfServiceCourse(course.id)
   })
@@ -186,7 +186,10 @@ export function CourseCard({ course }: Props) {
           course={course}
           nsPrefix={nsName}
           onClose={() => setSelfProvisionOpen(false)}
-          onCreated={() => { refetch(); setSelfProvisionOpen(false) }}
+          onCreated={() => {
+            setSelfProvisionOpen(false)
+            void refetchSelfService()
+          }}
         />
       )}
       {manageOpen && (
