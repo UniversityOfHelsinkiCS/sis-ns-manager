@@ -18,19 +18,6 @@ export const allowSelfProvisioning = async (
   return data
 }
 
-export const getSelfServiceCourse = async (id: string): Promise<{
-  selfServiceCourse: {
-    courseCode: string,
-    nsPrefix: string,
-    selfServiceEnabled: boolean,
-    demoOnly: boolean,
-    startDate: string,
-    endDate: string
-  } | null }> => {
-  const { data } = await axios.get(`/api/db/self-service-courses/${encodeURIComponent(id)}`)
-  return data
-}
-
 export const errorMessage = (err: unknown, fallback: string) => {
   if (axios.isAxiosError(err)) {
     return (err.response?.data as { message?: string })?.message ?? err.message

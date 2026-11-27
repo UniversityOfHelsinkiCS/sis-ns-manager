@@ -24,7 +24,7 @@ export const generateSettings = (method: string, jsonBody?: any) => {
 }
 
 const useApi = <T = unknown,>(
-  queryKey: string,
+  queryKey: string | readonly unknown[],
   endPoint: string,
   method: string,
   jsonBody?: Record<string, unknown>,
@@ -33,7 +33,7 @@ const useApi = <T = unknown,>(
   options: { enabled?: boolean } = {},
 ) => {
   const { data, isLoading, refetch } = useQuery<T>({
-    queryKey: [queryKey],
+    queryKey: typeof queryKey === 'string' ? [queryKey] : queryKey,
     enabled: options.enabled ?? true,
     queryFn: async () => {
       const settings = generateSettings(method, jsonBody)

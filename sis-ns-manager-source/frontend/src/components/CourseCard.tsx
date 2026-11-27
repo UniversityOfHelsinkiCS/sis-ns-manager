@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import type { CourseUnitRealisation, NamespaceInfo, Student } from '@common/types'
 import { getActiveUntil, getCourseEndDate, formatDate, courseNsName } from '../utils'
 import { CreateNamespaceModal, type ExistingGroups } from './CreateNamespaceModal'
@@ -8,7 +7,6 @@ import { SelfProvisionModal } from './SelfProvisionModal'
 import useApi from '../util/useApi'
 import { getNamespaceUsers, type NamespaceSummary } from '../util/okdApi'
 import './CourseCard.css'
-import { getSelfServiceCourse } from '../util/dbApi'
 
 interface Props {
   course: CourseUnitRealisation
@@ -59,10 +57,11 @@ export function CourseCard({ course }: Props) {
     .sort()[0]
   const activeUntil = formatDate(scheduledDeletion ?? activeUntilDate)
 
-  const { data: selfService, refetch: refetchSelfService } = useQuery({
-    queryKey: ['selfServiceCourse', course.id],
-    queryFn: () => getSelfServiceCourse(course.id)
-  })
+  const { data: selfService, refetch: refetchSelfService } = useApi<{ selfServiceCourse: { selfServiceEnabled: boolean } }>(
+    ['selfServiceCourse', course.id],
+    `/api/db/self-service-courses/${course.id}`,
+    'GET'
+  )
 
   const isSelfServiceEnabled = selfService?.selfServiceCourse?.selfServiceEnabled ?? false
 
