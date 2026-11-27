@@ -6,6 +6,8 @@ import {
   createSelfServiceCourse,
   deleteSelfServiceCourse,
   getSelfServiceCourseByCourseCode,
+  getTrackedSelfProvisionedNamespaces,
+  getSelfServiceCourseManualUsers,
   createSelfServiceCourseResponsibility
 } from '../utils/dbService.ts'
 
@@ -83,6 +85,42 @@ dbRouter.get('/self-service-courses/:id', requireCourseOwner, async (
         endDate: selfServiceCourse.end_date
       }
     })
+  } catch (err) {
+    console.error(err)
+    res.status(500).send({ message: (err as Error).message })
+  }
+})
+
+dbRouter.get('/self-service-courses/:id/self-provisioned-namespaces', requireCourseOwner, async (
+  req: express.Request, res: express.Response
+) => {
+  try {
+    const { id: courseId } = req.params
+    if (typeof courseId !== 'string') {
+      console.error('Expected course ID as a string')
+      res.status(400).send({ message: 'Course ID was expected as a string' })
+      return
+    }
+    const namespaces = await getTrackedSelfProvisionedNamespaces(courseId)
+    res.json(namespaces)
+  } catch (err) {
+    console.error(err)
+    res.status(500).send({ message: (err as Error).message })
+  }
+})
+
+dbRouter.get('/self-service-courses/:id/manual-users', requireCourseOwner, async (
+  req: express.Request, res: express.Response
+) => {
+  try {
+    const { id: courseId } = req.params
+    if (typeof courseId !== 'string') {
+      console.error('Expected course ID as a string')
+      res.status(400).send({ message: 'Course ID was expected as a string' })
+      return
+    }
+    const manualUsers = await getSelfServiceCourseManualUsers(courseId)
+    res.json(manualUsers)
   } catch (err) {
     console.error(err)
     res.status(500).send({ message: (err as Error).message })

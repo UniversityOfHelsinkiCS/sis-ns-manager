@@ -5,6 +5,7 @@ export type NamespaceSummary = {
   created: string
   endDate: string | null
   course: string | null
+  provisioner: string | null
 }
 
 export const createNamespace = (name: string, courseId: string, usernames: string[] = []) =>

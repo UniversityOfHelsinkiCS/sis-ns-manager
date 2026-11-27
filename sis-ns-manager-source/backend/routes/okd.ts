@@ -1,10 +1,14 @@
 import express from 'express'
 import type { User } from '../../common/types.ts'
 import { getCourse, getStudentsByNumbers } from '../utils/sisService.ts'
+import { getTrackedSelfProvisionedNamespaces } from '../utils/dbService.ts'
 import {
   PROVISIONER_ANNOTATION,
   END_DATE_ANNOTATION,
   COURSE_ANNOTATION,
+  SELF_PROVISION_COURSE_ANNOTATION,
+  SELF_PROVISION_END_DATE_ANNOTATION,
+  SELF_PROVISION_PROVISIONER_ANNOTATION,
   listNamespacesByAnnotation,
   createProject,
   patchNamespaceAnnotations,
@@ -15,6 +19,7 @@ import { isDemoUser, isValidNamespaceName, isValidUsername } from '../utils/vali
 import { demoNamespaces, getDemoNamespaceUsers } from '../utils/demoData.ts'
 import requireAllowed from '../middleware/requireAllowed.ts'
 import requireNamespaceOwner from '../middleware/requireNamespaceOwner.ts'
+import requireCourseOwner from '../middleware/requireCourseOwner.ts'
 
 const okdRouter = express.Router()
 
@@ -39,6 +44,41 @@ okdRouter.get('/namespaces', async (req, res) => {
       created: ns.metadata?.creationTimestamp,
       endDate: ns.metadata?.annotations?.[END_DATE_ANNOTATION] ?? null,
       course: ns.metadata?.annotations?.[COURSE_ANNOTATION] ?? null,
+    })),
+  )
+})
+
+// GET /api/okd/namespaces/self-provisioned/:id — self-provisioned namespaces for a specific course
+okdRouter.get('/namespaces/self-provisioned/:id', requireCourseOwner, async (req, res) => {
+  const courseCode = req.params.id
+  if (typeof courseCode !== 'string' || !courseCode) {
+    res.status(400).json({ message: 'Invalid course code' })
+    return
+  }
+
+  if (isDemoUser(req.user as User)) {
+    const dbDemoNamespaces = await getTrackedSelfProvisionedNamespaces(courseCode, true)
+    res.json(
+      dbDemoNamespaces.namespaces.map((ns) => ({
+        name: ns.namespace_name,
+        created: ns.created_at,
+        endDate: ns.selfServiceCourse?.end_date ?? null,
+        course: ns.selfServiceCourse?.course_unit_realisation_code ?? null,
+        provisioner: ns.provisioner_username ?? null,
+      }))
+    )
+    return
+  }
+
+  const namespaces = await listNamespacesByAnnotation(SELF_PROVISION_COURSE_ANNOTATION, courseCode)
+
+  res.json(
+    namespaces.map((ns) => ({
+      name: ns.metadata?.name,
+      created: ns.metadata?.creationTimestamp,
+      endDate: ns.metadata?.annotations?.[SELF_PROVISION_END_DATE_ANNOTATION] ?? null,
+      course: ns.metadata?.annotations?.[SELF_PROVISION_COURSE_ANNOTATION] ?? null,
+      provisioner: ns.metadata?.annotations?.[SELF_PROVISION_PROVISIONER_ANNOTATION] ?? null,
     })),
   )
 })

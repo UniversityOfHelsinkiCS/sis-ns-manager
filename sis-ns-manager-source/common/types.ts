@@ -10,8 +10,9 @@ export type GroupAssignment = Record<string, number>
 
 export interface NamespaceInfo {
   name: string
-  type: 'course' | 'group'
+  type: 'course' | 'group' | 'self-provisioned'
   groupNumber?: number
+  provisioner?: string
   created: string // ISO date string
   activeUntil?: string // ISO date string, set when enrolled for deletion
   studentCount: number

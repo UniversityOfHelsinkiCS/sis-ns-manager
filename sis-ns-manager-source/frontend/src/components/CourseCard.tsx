@@ -4,6 +4,7 @@ import { getActiveUntil, getCourseEndDate, formatDate, courseNsName } from '../u
 import { CreateNamespaceModal, type ExistingGroups } from './CreateNamespaceModal'
 import { ManageModal } from './ManageModal'
 import { SelfProvisionModal } from './SelfProvisionModal'
+import { ManageSelfProvisionModal } from './ManageSelfProvisionModal'
 import useApi from '../util/useApi'
 import { getNamespaceUsers, type NamespaceSummary } from '../util/okdApi'
 import './CourseCard.css'
@@ -26,6 +27,14 @@ export function CourseCard({ course }: Props) {
   const courseNamespaces = all
     .filter((ns) => ns.course === course.id)
     .sort((a, b) => a.created.localeCompare(b.created))
+  
+  // Namespaces that are self-provisioned by students for this course.
+  const { data: selfProvisionedNamespacesData } = useApi<NamespaceSummary[]>(
+    ['selfProvisionedNamespaces', course.id],
+    `/api/okd/namespaces/self-provisioned/${course.id}`,
+    'GET'
+  )
+  const selfProvisionedNamespaces = Array.isArray(selfProvisionedNamespacesData) ? selfProvisionedNamespacesData : []
 
   // Creation is binary: more than one namespace means group mode. Namespace
   // names are user-defined, so the "Group N" number is just the creation order.
@@ -34,6 +43,16 @@ export function CourseCard({ course }: Props) {
     name: ns.name,
     type: groupMode ? 'group' : 'course',
     groupNumber: groupMode ? i + 1 : undefined,
+    created: ns.created,
+    activeUntil: ns.endDate ?? undefined,
+    studentCount: 0,
+  }))
+
+  const existingSelfProvisionedNamespaces: NamespaceInfo[] = selfProvisionedNamespaces.map((ns) => ({
+    name: ns.name,
+    type: 'self-provisioned',
+    groupNumber: undefined,
+    provisioner: ns.provisioner ?? undefined,
     created: ns.created,
     activeUntil: ns.endDate ?? undefined,
     studentCount: 0,
@@ -67,6 +86,7 @@ export function CourseCard({ course }: Props) {
 
   const [open, setCreateOpen] = useState(false)
   const [manageOpen, setManageOpen] = useState(false)
+  const [manageSelfProvisionOpen, setManageSelfProvisionOpen] = useState(false)
   const [selfProvisionOpen, setSelfProvisionOpen] = useState(false)
   const [students, setStudents] = useState<Student[]>([])
   // Set while the create modal is open in "Add new groups" mode.
@@ -161,7 +181,7 @@ export function CourseCard({ course }: Props) {
               )}
 
               {!isActive && isSelfServiceEnabled && (
-                <button className="btn btn--manage">
+                <button className="btn btn--manage" onClick={() => setManageSelfProvisionOpen(true)}>
                   Manage self-provisioning
                 </button>
               )}
@@ -198,6 +218,13 @@ export function CourseCard({ course }: Props) {
           onClose={() => setManageOpen(false)}
           onDeleted={() => { refetch() }}
           onAddGroups={handleAddGroupsOpen}
+        />
+      )}
+      {manageSelfProvisionOpen && (
+        <ManageSelfProvisionModal
+          course={course}
+          onClose={() => setManageSelfProvisionOpen(false)}
+          namespaces={existingSelfProvisionedNamespaces}
         />
       )}
     </>

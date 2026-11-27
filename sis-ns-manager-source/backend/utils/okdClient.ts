@@ -16,6 +16,10 @@ export const END_DATE_ANNOTATION = 'sis-ns-manager/endDate'
 // be customised at creation time.
 export const COURSE_ANNOTATION = 'sis-ns-manager/course'
 
+export const SELF_PROVISION_PROVISIONER_ANNOTATION = 'sis-ns-manager-student/provisioner'
+export const SELF_PROVISION_END_DATE_ANNOTATION = 'sis-ns-manager-student/endDate'
+export const SELF_PROVISION_COURSE_ANNOTATION = 'sis-ns-manager-student/course'
+
 const errStatus = (err: unknown): number | undefined =>
   (err as { code?: number }).code ?? (err as { statusCode?: number }).statusCode
 

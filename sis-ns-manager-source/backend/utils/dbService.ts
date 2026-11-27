@@ -1,5 +1,11 @@
 import { SelfServiceCourse } from '../db/models/SelfServiceCourse.ts'
 import { SelfServiceCourseResponsibility } from '../db/models/SelfServiceCourseResponsibility.ts'
+import { TrackedNamespace } from '../db/models/TrackedNamespaces.ts'
+import {
+  COURSE_ANNOTATION,
+  listNamespacesByAnnotation
+} from './okdClient.ts'
+import '../db/associations.ts'
 
 export const createSelfServiceCourse = async (
     course_unit_realisation_code: string,
@@ -41,6 +47,43 @@ export const getSelfServiceCourseByCourseCode = async (
   return await SelfServiceCourse.findOne({
     where: { course_unit_realisation_code: course_code }
   })
+}
+
+export const getTrackedSelfProvisionedNamespaces = async (
+    self_service_course_code: string,
+    demo_only: boolean = false
+): Promise<{ namespaces: TrackedNamespace[] }> => {
+  const namespaces = await TrackedNamespace.findAll({
+    include: [{
+      model: SelfServiceCourse,
+      as: 'selfServiceCourse',
+      where: {
+        course_unit_realisation_code: self_service_course_code,
+        demo_only
+      }
+    }]
+  })
+  return { namespaces }
+}
+
+export const getSelfServiceCourseManualUsers = async (
+    self_service_course_code: string
+): Promise<{ usernames: string[] }> => {
+  const course = await SelfServiceCourse.findOne({
+    where: { course_unit_realisation_code: self_service_course_code },
+    include: [{
+      model: SelfServiceCourseResponsibility,
+      as: 'responsibilities',
+      attributes: ['responsible_person_id']
+    }]
+  })
+  if (!course) {
+    throw new Error('Self-service course not found')
+  }
+  return { usernames: course.responsibilities
+    .map(user => user.responsible_person_id)
+    .filter(username => username !== course.allowing_teacher_username)
+  }
 }
 
 export const createSelfServiceCourseResponsibility = async (
